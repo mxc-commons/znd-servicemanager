@@ -66,14 +66,6 @@ compatibility of the PHP implementation with the performance of a C implementati
 
 To be done.
 
-## Copyright Acknowledgement
-
-Other than the parent project zend-servicemanager this library will acknowledge your copyright on significant changes. If you decide to invest your time and money contributing to this project, your copyright will be maintaned. Please add your copyright notice to copyrights.md specifying the particular things you claim copyright for in `copyrights.md`.
-
-Please consider if your planned copyright claims are valid before you claim. For example, we consider a claim for copyright regarding a global search & replace of `Interop\container` with `psr-11\container` as not appropriate. But we will maintain inappropriate claims also, if you provide a copyright description which is detailed on every level.
-
-The only restriction for copyright claimes is that you license the things you supply under the New BSD License, the license under which this library is generally provided.
-
 ##License
 
 mxc-servicemanager is released under the New BSD License. See `license.txt`.
@@ -218,3 +210,13 @@ For your convenience you will find benchmark comparisons of zend-servicemanager:
 	| benchAddAbstractFactoryByClassName | 3.488µs           | 2.436µs          |
 	| benchAddAbstractFactoryByInstance  | 3.118µs           | 2.043µs          |
 	+------------------------------------+-------------------+------------------+
+	
+## Copyright Acknowledgement
+
+Other than the parent project zend-servicemanager this library will acknowledge your copyright on significant changes. If you decide to invest your time and money contributing to this project, your copyright will be maintaned. Please add your copyright notice to copyrights.md specifying the particular things you claim copyright for in `copyrights.md`.
+
+Please consider if your planned copyright claims are valid before you claim. For example, we consider a claim for copyright regarding a global search & replace of `Interop\container` with `psr-11\container` as not appropriate. But we will maintain inappropriate claims also, if you provide a copyright description which is detailed on every level.
+
+The only restriction for copyright claimes is that you license the things you supply under the New BSD License, the license under which this library is generally provided.
+
+	

@@ -64,42 +64,7 @@ compatibility of the PHP implementation with the performance of a C implementati
 
 ##Installation
 
-This component is meant as a transparent replacement of zend-servicemanager. Some Zend Framework components feature hard wired wired dependencies to `Zend\ServiceManager`. To enable to replace zend-servicemanager with mxc-servicemanager, latter is defined in the same namespace `Zend\ServiceManager`.
-
-### Via Packagist
-
-Currently Packagist does not support the provision of projects which occupy namespaces which are already occupied by existing libraries. In our case it's `Zend\ServiceManager` which is used by `zend-servicemanager` also and originally.
-So we are sorry not to be able to support direct installation via composer without requirement for afterwards customization currently for zend-servicemanager replacement. We apologize for any inconveniences.
-
-### Use as stand-alone component
-
-mxc-servicemanager has to live in the `Zend\ServiceManager`namespace to allow transparent replacement. We supply this package using namespaces where the string 'Zend' is replaced by 'Mxc'. If you like to use this package aa is (i.e. without transparent replacement of zend-servicemanager) you can use it as is by
-
-1. Add this project to your composer.json:
-
-    ```json
-    "require": {
-        "mxc-commons/mxc-servicemanager": "dev-master"
-    }
-    ```
-
-2. Now tell composer to download mxc-servicemanager by running the command:
-
-    ```bash
-    $ composer update
-    ```
-
-mxc-servicemanager is now available via `Mxc\ServiceManager\ServiceManager`. This will not integrate mxc-servicemanager to Zend applications.
-
-### Use as replacement for zend-servicemanager
-
-If you want to use mxc-servicemanager as a replacement for zend-servicemanager in zendframework dependent projects (expressive, ...), you have to do a bit more, sorry.
-
-1. Follow the steps of 'Use as stand-alone component' described above.
-2. Run a replace on all files of `vendors\maxence\mxc-servicemanager` to change 'Mxc' to 'Zend'.
-3. Remove zend-servicemanager from your composer dependencies.
-
-We will provide an after-xxx script to do that automatically for you asap.
+To be done.
 
 ## Copyright Acknowledgement
 

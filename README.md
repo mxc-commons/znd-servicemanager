@@ -7,14 +7,9 @@ Develop:
 [![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-servicemanager.svg?branch=develop)](https://secure.travis-ci.org/mxc-commons/mxc-servicemanager)
 [![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-servicemanager/badge.svg?branch=develop)](https://coveralls.io/github/mxc-commons/mxc-servicemanager?branch=develop)
 
-Compatibility to zend-servicemanager is main design paradigm of this component.
 
 - File issues at https://github.com/mxc-commons/mxc-servicemanager/issues
 - [Online documentation of zend-servicemanager](https://docs.zendframework.com/zend-servicemanager)
-
-## Version
-
-Version 0.0.1 created by Frank Hein, maxence operations GmbH
 
 ## Important Note
 
@@ -22,20 +17,21 @@ Currently initial setup of this project is still going on. Please do not downloa
 
 ## Introduction
 
-mxc-servicemanager is a component featuring an API compatible to [zend-servicemanager  3.3](https://github.com/zendframework/zend-servicemanager "zend-servicemanager").
+mxc-servicemanager is a fork of [zend-servicemanager  3.3](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). We changed the repo name to indicate that this fork
+features well maintained master and develop branches which can differ from master and develop branches of zend-servicemanager.
 
-With mxc-servicemanager we refactored several parts if zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution. This pacackage was introduced to deliver major progress early.
+For mxc-servicemanager we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution. This package was introduced to deliver enhancements early.
 
-A major design constraint is zend-servicemanager compatibility. All changes applied to mxc-servicemanager are proposed to the zend-servicemanager project also via pull request. Changed master and develop branches of zend-servicemanager will get merged into mxc-servicemanager asap after release. Asap can mean several days later.
+A major design constraint is zend-servicemanager compatibility. All changes applied to mxc-servicemanager are proposed to the zend-servicemanager project also via pull request. Changed master and develop branches of zend-servicemanager will get merged into mxc-servicemanager asap after release.
 
-Our motivation to do this comes out of our project portfolio management on one hand (we need a fast service manager for other projects), our commitment to Open Source and the power of sharing on the other hand, and from economical constraints: We are not strong or big enough to work on masses of libraries at the same time, so we have to be focussed (this on the third hand ;).
+Our motivation to do this comes out of our project portfolio management on one hand (we need a fast service manager for other projects), our commitment to Open Source on the other hand, and from economical constraints.
 
-This project is our way to be able to apply progress continously. If our quality assurance says go, we go and merge.
+We are not strong or big enough to work on many projects at the same time, so we have to be focussed (this on the third hand ;). We need a way to bring our ideas for servicemanager enhancements in having a limited time frame.
+This fork is the playground where we can complete and deploy our work early.
 
-Features / Goals
-----------------
+## Features / Goals
 
-* Speed up service manager configuration via configure() (currently 3x faster)
+* Speed up service manager configuration via configure()
 * Speed up service manager configuration via the APIs:
 	* addAbstractFactory
 	* addDelegator
@@ -51,27 +47,55 @@ Features / Goals
 	* delegators
 	* invokables
 	* abstract factories
-
-Goal of this approach is to exploit PHP capabilities as far as possible for performance enhancements without giving up on backwards compatibility to
+	
+Goal of this activities is to exploit PHP capabilities as far as possible for performance enhancements without giving up on backwards compatibility to
 zend-servicemanager 3.3.2 (currently). We are working on optimizing the PHP implementation in order to find out what the particular requirements for
 maximum speed actually are. Another thing we want to learn about is how to streamline service manager configuration in order to ease comprehension and
 effectivity.
 
+Please refer to the "Benchmark Results" section at the end of this file for details on current achievements towards the goals.	
+
 Based on what we learn we plan to provide a PHP core component or extension library implemented in C, which will combine the functionality and
 compatibility of the PHP implementation with the performance of a C implementation. Work on that will not start before 07-2018. Please do not expect visible or stable results in 2018. Preliminary project name is mxc-servicemanager-x2.
 
-##Installation
+## Version
 
-To be done.
+Version 0.0.1 created by Frank Hein, maxence operations GmbH
 
-##License
+## Installation
+
+mxc-servicemanager is a fork of zend-servicemanager. As such we can not provide a composer package. You can not use zend-servicemanager and mxc-servicemanager in the same project, because both live in the Zend\ServiceManager namespace.
+
+Installation is more or less:
+
+1. Clone the repository to your project directory.
+
+2. Remove zend-servicemanager from your projects dependencies in composer.json
+
+3. If your project is composer based, redirect servicemanager autoloading to the mxc-servicemanager directory.
+
+     "autoload": {
+         "psr-4": {
+             "Zend\\ServiceManager\\": "src/"
+         }
+     },
+
+4. Run composer dumpautoload
+
+Note: Things can be more complex if your project is made up of components, which again have dependencies to zend-servicemanager. We do not use this fork that way and do not recommend to do so for other purposes than testing.
+
+## License
 
 mxc-servicemanager is provided under the New BSD License. See `license.txt`.
 
+## Discussion
+
+Platform for discussion of all things related to this fork is the [issues section of this repository](https://github.com/mxc-commons/mxc-servicemanager/issues)
+
 ## Copyright Acknowledgement
 
-If you want to contribute his library will acknowledge your copyright on significant changes. Please add your copyright notice to copyrights.md specifying the particular things you hold the copyright for in `copyrights.md`.
-The only restriction for copyright claims is that you license the things you supply under the New BSD License, the license under which this library is generally provided.
+If you want to contribute to this fork, you may add your copyright notice to copyrights.md specifying the particular things you hold the copyright for in `copyrights.md`.
+The only restriction for copyright claims is that you have license the things you supply under the New BSD License, the same license under which both zend-servicemanager and this fork are provided.
 
 ## Benchmarks
 
@@ -85,7 +109,7 @@ To execute the benchmarks you can run the following command:
 $ vendor/bin/phpbench run --report=aggregate
 ```
 
-On Windows phpbench you have to
+On Windows you have to
 
 ```bash
 $ vendor/bin/phpbench run benchmarks --report=aggregate
@@ -93,9 +117,9 @@ $ vendor/bin/phpbench run benchmarks --report=aggregate
 
 ## Benchmark results
 
-For your convenience you will find benchmark comparisons of zend-servicemanager:master and mxc-servicemanager:master. This section will be updated as new versions come up on either side.
+For your convenience you will find benchmark comparisons of zend-servicemanager:master and mxc-servicemanager:develop. This section will be updated as new versions come up on either side.
 
-	$ vendor\bin\phpbench report --file=..\master.FetchNewServiceManager.xml --file=..\PR231.FetchNewServiceManager.xml --report=compare
+	$ vendor\bin\phpbench report --file=..\zend.FetchNewServiceManager.xml --file=..\mxc.FetchNewServiceManager.xml --report=compare
 	benchmark: FetchNewServiceManagerBench
 	+----------------------------------+-----------------+----------------+
 	| subject                          | suite:zend:mean | suite:mxc:mean |
@@ -103,7 +127,7 @@ For your convenience you will find benchmark comparisons of zend-servicemanager:
 	| benchFetchServiceManagerCreation | 878.050µs       | 287.376µs      |
 	+----------------------------------+-----------------+----------------+
 
-	$ vendor\bin\phpbench report --file=..\master.all.xml --file=..\PR231.all.xml --report=compare
+	$ vendor\bin\phpbench report --file=..\zend.all.xml --file=..\mxc.all.xml --report=compare
 	benchmark: FetchCachedServicesBench
 	+----------------------------------+-----------------+----------------+
 	| subject                          | suite:zend:mean | suite:mxc:mean |

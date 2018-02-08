@@ -1,4 +1,5 @@
-Copyright (c) 2005-2017, Zend Technologies USA, Inc.
+Copyright (c) 2005-2018, Zend Technologies USA, Inc.
+Copyright (c) 2018 maxence operations gmbh, Germany
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -11,7 +12,7 @@ are permitted provided that the following conditions are met:
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
 
-- Neither the name of Zend Technologies USA, Inc. nor the names of its
+- Neither the name of the copyright holders nor the names of their
   contributors may be used to endorse or promote products derived from this
   software without specific prior written permission.
 

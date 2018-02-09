@@ -21,6 +21,7 @@ use Zend\ServiceManager\Exception\CyclicAliasException;
 use Zend\ServiceManager\Exception\InvalidArgumentException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\InvokableFactory;
 
 use function array_merge_recursive;
 use function class_exists;
@@ -480,9 +481,7 @@ class ServiceManager implements ServiceLocatorInterface
         if (! empty($config['initializers'])) {
             $this->resolveInitializers($config['initializers']);
         }
-
         $this->configured = true;
-
         return $this;
     }
 
@@ -626,8 +625,12 @@ class ServiceManager implements ServiceLocatorInterface
      * @param string[]|Initializer\InitializerInterface[]|callable[] $initializers
      *
      */
-    private function resolveInitializers(array $initializers)
+    private function resolveInitializers(array $initializers = null)
     {
+        if ($initializers === null) {
+            $initializers = $this->initializers;
+            $this->initializers = [];
+        }
         foreach ($initializers as $initializer) {
             if (is_string($initializer) && class_exists($initializer)) {
                 $initializer = new $initializer();
@@ -758,7 +761,7 @@ class ServiceManager implements ServiceLocatorInterface
     {
         try {
             if (! isset($this->delegators[$resolvedName])) {
-                $object  = $this->createObjectThroughFactory($resolvedName, $options);
+                $object = $this->createObjectThroughFactory($resolvedName, $options);
             } else {
                 $object = $this->createDelegatorFromName($resolvedName, $options);
             }

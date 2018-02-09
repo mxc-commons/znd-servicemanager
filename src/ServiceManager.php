@@ -35,7 +35,6 @@ use function spl_autoload_register;
 use function spl_object_hash;
 use function sprintf;
 use function trigger_error;
-use Zend\ServiceManager\Factory\InvokableFactory;
 
 /**
  * Service Manager.

@@ -1,6 +1,6 @@
 {
-    "name": "zendframework/zend-servicemanager",
-    "description": "Factory-Driven Dependency Injection Container",
+    "name": "mxc-commons/mxc-services",
+    "description": "Factory-Driven Dependency Injection Container Compatible To Zend ServiceManager 3",
     "license": "BSD-3-Clause",
     "keywords": [
         "di",
@@ -9,16 +9,15 @@
         "psr-11",
         "zf",
         "zendframework",
+        "services",
         "servicemanager",
-        "service-manager"
+        "service-manager",
+        "mxc-commons"
     ],
     "support": {
         "docs": "https://docs.zendframework.com/zend-servicemanager/",
-        "issues": "https://github.com/zendframework/zend-servicemanager/issues",
-        "source": "https://github.com/zendframework/zend-servicemanager",
-        "rss": "https://github.com/zendframework/zend-servicemanager/releases.atom",
-        "slack": "https://zendframework-slack.herokuapp.com",
-        "forum": "https://discourse.zendframework.com/c/questions/components"
+        "issues": "https://github.com/mxc-commons/mxc-services/issues",
+        "source": "https://github.com/mxc-commons/mxc-services"
     },
     "require": {
         "php": "^5.6 || ^7.0",

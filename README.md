@@ -1,31 +1,34 @@
 # mxc-services
 
 Master:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=master)](https://secure.travis-ci.org/mxc-commons/mxc-services)
-[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=master)](https://coveralls.io/github/mxc-commons/mxc-services?branch=master)
+[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=mxc-master)](https://secure.travis-ci.org/mxc-commons/mxc-services)
+[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=mxc-master)](https://coveralls.io/github/mxc-commons/mxc-services?branch=mxc-master)
 Develop:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=develop)](https://secure.travis-ci.org/mxc-commons/mxc-services)
-[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=develop)](https://coveralls.io/github/mxc-commons/mxc-services?branch=develop)
+[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=mxc-develop)](https://secure.travis-ci.org/mxc-commons/mxc-services)
+[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=mxc-develop)](https://coveralls.io/github/mxc-commons/mxc-services?branch=mxc-develop)
 
 
 - File issues, ask and discuss at https://github.com/mxc-commons/mxc-services/issues
 - [Online documentation of zend-servicemanager](https://docs.zendframework.com/zend-servicemanager)
 
+## Version
+
+Version 0.0.1 created by Frank Hein, maxence operations GmbH
+
 ## Important Note
 
-Currently initial setup of this project is still going on. Please do not download or use as long as this notice is still part of this file.
+Currently initial setup of this project is still going on. Please do not rely on any features advertised as long as this notice is part of this document. If you want to install anyway,
+please report any issues observed to the [issues section of this repository](https://github.com/mxc-commons/mxc-services/issues). This will help to fix these issues fastly.
 
 ## Introduction
 
-mxc-services is a fork of [zend-servicemanager  3.3](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). We changed the repo name to indicate that this fork
-features well maintained master and develop branches which can differ from master and develop branches of zend-servicemanager. An important difference to zend-servicemanager is that we do not
-support PHP 5.6. We provide another repository
+mxc-services is a fork of [zend-servicemanager  3.3](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). We changed the repo name to indicate that this fork features well maintained master and develop branches which can differ from master and develop branches of zend-servicemanager. An important difference to zend-servicemanager is that we do not support PHP 5.6.
 
 For mxc-services we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution. This package was introduced to deliver enhancements early.
 
-A major design constraint is zend-servicemanager compatibility. All changes applied to mxc-services are proposed to the zend-servicemanager project also via pull request. Changes master and develop branches of zend-servicemanager will get merged into mxc-services.
+A major design constraint is zend-servicemanager compatibility. All changes applied to mxc-services would get propesed to the zend-servicemanager project also via pull request, if they wanted to consider them. Changes of master and develop branches of zend-servicemanager will get merged into mxc-services.
 
-Our motivation to do this is our need for a fast servicemanager component and our commitment to open source.
+Our motivation to do this is our need for a fast servicemanager component, our commitment to open source and our commitment to quality assurement being (almost) as fast as the development team.
 
 ## Features / Goals
 
@@ -47,7 +50,7 @@ Our motivation to do this is our need for a fast servicemanager component and ou
 	* abstract factories
 
 Goal of this activities is to exploit PHP capabilities as far as possible for performance enhancements without giving up on backwards compatibility to
-zend-servicemanager 3.3.2 (currently). We are working on optimizing the PHP implementation in order to find out what the particular requirements for
+zend-servicemanager (3.3.2 currently). We are working on optimizing the PHP implementation in order to find out what the particular requirements for
 maximum speed actually are. Another thing we want to learn about is how to streamline service manager configuration in order to ease comprehension and
 effectivity.
 
@@ -56,33 +59,32 @@ compatibility of the PHP implementation with the performance of a C implementati
 
 Please refer to the "State of Progress" section at the end of this file for details on our current achievements towards the goals.
 
-## Version
-
-Version 0.0.1 created by Frank Hein, maxence operations GmbH
-
 ## Installation
 
 mxc-services is a fork of zend-servicemanager. As such we can not provide a distinct composer package for this repository.
 
-For your convenience we provide a distinct repository [mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager) which can by installed by composer. This other repository is fed from here and provides ServiceManager.php and AbstractPluginManager.php only. Both classes live in our
+For your convenience we provide a distinct repository [mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager) which can by installed via composer. This other repository is fed from here and provides ServiceManager.php and AbstractPluginManager.php only. Both classes live in our
 namespace MxcCommons\ServiceManager.
 
 To install mxc-servicemanager:
 
 1. Add a dependency to mxc-servicemanager to your composer.json
 
-    "require": {
-        ...
+    ```json
+	"require": {
         "mxc-commons/mxc-servicemanager": "*"
     }
+	```
 
 2. Configure PSR-4 compliant autoloading of the namespace MxcCommons. If you use the recommended way of composer based autoloading, add this configuration to your composer.json
 
+    ```json
     "autoload": {
         "psr-4": {
             "MxcCommons\\ServiceManager\\": "src/"
         }
     },
+	```
 
 3. Run composer update
 
@@ -90,8 +92,9 @@ You can now use MxcCommons\ServiceManager in your project.
 
 ## Using in zendframework based projects
 
-If you want to tranparently replace the servicemanager component your application uses with mxc-servicemanager, we do not currently provide a managed way to accomplish that.
-The easiest way do that is to replace ServiceManager.php and AbstractPluginManager.php  in the zend-servicemanager/src directory with the class files provided here.
+If you want to tranparently replace the servicemanager component your application uses with mxc-servicemanager, we can not currently provide a managed way to accomplish that.
+
+The easiest way to do that is to replace ServiceManager.php and AbstractPluginManager.php in the zend-servicemanager/src directory with the class files provided here.
 Change the the namespace of both files from MxcCommons\ServiceManager to Zend\Servicemanager, and your done.
 
 ## License

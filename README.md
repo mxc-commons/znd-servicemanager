@@ -1,11 +1,11 @@
 # mxc-services
 
 Master:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=mxc-master)](https://secure.travis-ci.org/mxc-commons/mxc-services)
-[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=mxc-master)](https://coveralls.io/github/mxc-commons/mxc-services?branch=mxc-master)
+[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=master)](https://secure.travis-ci.org/mxc-commons/mxc-services)
+[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=master)](https://coveralls.io/github/mxc-commons/mxc-services?branch=master)
 Develop:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=mxc-develop)](https://secure.travis-ci.org/mxc-commons/mxc-services)
-[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=mxc-develop)](https://coveralls.io/github/mxc-commons/mxc-services?branch=mxc-develop)
+[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-services.svg?branch=develop)](https://secure.travis-ci.org/mxc-commons/mxc-services)
+[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-services/badge.svg?branch=develop)](https://coveralls.io/github/mxc-commons/mxc-services?branch=develop)
 
 
 - File issues, ask and discuss at https://github.com/mxc-commons/mxc-services/issues

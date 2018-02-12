@@ -5,3 +5,6 @@
 /vendor/
 /zf-mkdoc-theme.tgz
 /zf-mkdoc-theme/
+/.settings/
+/.buildpath
+/.project

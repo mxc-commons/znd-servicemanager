@@ -17,7 +17,6 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\ServiceManager\ServiceManager;
 use ZendTest\ServiceManager\TestAsset\InvokableObject;
 use ZendTest\ServiceManager\TestAsset\SimpleServiceManager;
-use Zend\ServiceManager\Exception\CyclicAliasException;
 use PHPUnit\Framework\MockObject\Invokable;
 
 /**

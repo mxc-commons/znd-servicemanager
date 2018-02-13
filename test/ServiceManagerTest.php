@@ -71,10 +71,6 @@ class ServiceManagerTest extends TestCase
         $serviceManager->get(stdClass::class);
     }
 
-    /**
-     * @covers \Zend\ServiceManager\ServiceManager::doCreate
-     * @covers \Zend\ServiceManager\ServiceManager::createDelegatorFromName
-     */
     public function testCanWrapCreationInDelegators()
     {
         $config = [

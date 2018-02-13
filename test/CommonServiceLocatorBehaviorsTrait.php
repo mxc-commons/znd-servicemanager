@@ -586,6 +586,7 @@ trait CommonServiceLocatorBehaviorsTrait
     }
 
     /**
+     * @covers \Zend\ServiceManager\ServiceManager::createServiceFromDelegator
      * @dataProvider invalidDelegators
      */
     public function testInvalidDelegatorShouldRaiseExceptionDuringCreation(

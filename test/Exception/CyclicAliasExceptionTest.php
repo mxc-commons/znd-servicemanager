@@ -26,6 +26,7 @@ class CyclicAliasExceptionTest extends TestCase
     public function testFromCyclicAlias($alias, array $aliases, $expectedMessage)
     {
         $exception = CyclicAliasException::fromCyclicAlias($alias, $aliases);
+
         self::assertInstanceOf(CyclicAliasException::class, $exception);
         self::assertSame($expectedMessage, $exception->getMessage());
     }

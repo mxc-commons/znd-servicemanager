@@ -132,7 +132,7 @@ trait CommonServiceLocatorBehaviorsTrait
         ]);
 
         $object = $serviceManager->get(stdClass::class);
-        $this->assertInstanceOf(stdClass::class, $object);
+        self::assertInstanceOf(stdClass::class, $object);
     }
 
     public function testCanCreateServiceWithAbstractFactory()
@@ -265,7 +265,7 @@ trait CommonServiceLocatorBehaviorsTrait
             ]
         ]);
 
-        $this->expectException(ServiceNotCreatedException::class);
+        self::expectException(ServiceNotCreatedException::class);
 
         $serviceManager->get(stdClass::class);
     }
@@ -278,7 +278,7 @@ trait CommonServiceLocatorBehaviorsTrait
             ]
         ]);
 
-        $this->expectException(ServiceNotCreatedException::class);
+        self::expectException(ServiceNotCreatedException::class);
 
         $serviceManager->get(stdClass::class);
     }
@@ -519,8 +519,8 @@ trait CommonServiceLocatorBehaviorsTrait
         $factory,
         $contains = 'invalid abstract factory'
     ) {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($contains);
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($contains);
         $this->createContainer([
             'abstract_factories' => [
                 $factory,
@@ -561,7 +561,7 @@ trait CommonServiceLocatorBehaviorsTrait
         $contains = 'invalid initializer'
     ) {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($contains);
+        self::expectExceptionMessage($contains);
         $this->createContainer([
             'initializers' => [
                 $initializer,
@@ -572,8 +572,8 @@ trait CommonServiceLocatorBehaviorsTrait
     public function testGetRaisesExceptionWhenNoFactoryIsResolved()
     {
         $serviceManager = $this->createContainer();
-        $this->expectException(ContainerException::class);
-        $this->expectExceptionMessage('Unable to resolve');
+        self::expectException(ContainerException::class);
+        self::expectExceptionMessage('Unable to resolve');
         $serviceManager->get('Some\Unknown\Service');
     }
 
@@ -604,8 +604,8 @@ trait CommonServiceLocatorBehaviorsTrait
             ],
         ]);
 
-        $this->expectException(ServiceNotCreatedException::class);
-        $this->expectExceptionMessage($contains);
+        self::expectException(ServiceNotCreatedException::class);
+        self::expectExceptionMessage($contains);
         $serviceManager->get(stdClass::class);
     }
 
@@ -803,7 +803,7 @@ trait CommonServiceLocatorBehaviorsTrait
     {
         $container = $this->createContainer(['services' => ['foo' => $this]]);
         $container->setAllowOverride(false);
-        $this->expectException(ContainerModificationsNotAllowedException::class);
+        self::expectException(ContainerModificationsNotAllowedException::class);
         call_user_func_array([$container, $method], $args);
     }
 
@@ -845,7 +845,7 @@ trait CommonServiceLocatorBehaviorsTrait
      */
     public function testCrashesOnCyclicAliases()
     {
-        $this->expectException(CyclicAliasException::class);
+        self::expectException(CyclicAliasException::class);
 
         $this->createContainer([
             'aliases' => [
@@ -859,7 +859,7 @@ trait CommonServiceLocatorBehaviorsTrait
     {
         $sm = $this->createContainer([]);
 
-        $this->expectException(CyclicAliasException::class);
+        self::expectException(CyclicAliasException::class);
         $sm->setAlias('alias', 'alias');
     }
 
@@ -875,8 +875,8 @@ trait CommonServiceLocatorBehaviorsTrait
                 'alias3' => stdClass::class,
             ],
         ]);
-        $this->assertSame($sm->get('alias1'), $sm->get('alias2'));
-        $this->assertSame($sm->get(stdClass::class), $sm->get('alias1'));
+        self::assertSame($sm->get('alias1'), $sm->get('alias2'));
+        self::assertSame($sm->get(stdClass::class), $sm->get('alias1'));
     }
 
     /**
@@ -908,21 +908,21 @@ trait CommonServiceLocatorBehaviorsTrait
         foreach ($test as $method) {
             $obj = $sm->$method($name);
             $object[$shared ? $method : 'build'][] = $obj;
-            $this->assertNotNull($obj);
-            $this->assertTrue($sm->has($name));
+            self::assertNotNull($obj);
+            self::assertTrue($sm->has($name));
         }
 
         // compares the first to the first also, but ok
         foreach ($object['get'] as $sharedObj) {
-            $this->assertSame($object['get'][0], $sharedObj);
+            self::assertSame($object['get'][0], $sharedObj);
         }
         // objects from object['build'] have to be different
         // from all other objects
         foreach ($object['build'] as $idx1 => $nonSharedObj1) {
-            $this->assertNotContains($nonSharedObj1, $object['get']);
+            self::assertNotContains($nonSharedObj1, $object['get']);
             foreach ($object['build'] as $idx2 => $nonSharedObj2) {
                 if ($idx1 !== $idx2) {
-                    $this->assertNotSame($nonSharedObj1, $nonSharedObj2);
+                    self::assertNotSame($nonSharedObj1, $nonSharedObj2);
                 }
             }
         }

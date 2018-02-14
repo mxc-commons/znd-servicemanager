@@ -338,12 +338,10 @@ class ServiceManager implements ServiceLocatorInterface
         // instantiate them to avoid checks during service construction.
         if (! empty($config['abstract_factories'])) {
             $this->abstractFactories = $config['abstract_factories'] + $this->abstractFactories;
-            //$this->resolveAbstractFactories($config['abstract_factories']);
         }
 
         if (! empty($config['initializers'])) {
-            $this->initializers = $config[$initializers] + $this->initializers;
-//            $this->resolveInitializers($config['initializers']);
+            $this->initializers = $config['initializers'] + $this->initializers;
         }
         $this->configured = true;
         return $this;
@@ -427,13 +425,7 @@ class ServiceManager implements ServiceLocatorInterface
             return true;
         }
 
-        foreach ($this->abstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($this->creationContext, $resolvedName)) {
-                $this->factories[$resolvedName] = $abstractFactory;
-                return true;
-            }
-        }
-        return false;
+        return $this->checkServiceFromAbstractFactory($resolvedName);
     }
 
     /**
@@ -493,17 +485,28 @@ class ServiceManager implements ServiceLocatorInterface
             return $options === null ? new $invokable() : new $invokable($options);
         }
 
-        // Check abstract factories
-        foreach ($this->abstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($this->creationContext, $name)) {
-                // promote abstract factory to factory
-                $this->factories[$name] = $abstractFactory;
-                return $abstractFactory($this->creationContext, $name, $options);
-            }
-        }
-
-        throw ServiceNotFoundException::fromUnknownService($name);
+        return $this->createServiceFromAbstractFactory($name, $options);
     }
+
+    private function checkServiceFromAbstractFactory($name)
+    {
+        foreach ($this->abstractFactories as $idx => $abstractFactory) {
+            if (is_string($abstractFactory) && class_exists($abstractFactory)) {
+                $abstractFactory = new $abstractFactory();
+                $this->abstractFactories[$idx] = $abstractFactory;
+            }
+
+            if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+                if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                    $this->factories[$name] = $abstractFactory;
+                    return true;
+                }
+                continue;
+            }
+            return false;
+        }
+    }
+
 
     private function createServiceFromAbstractFactory($name, array $options = null)
     {
@@ -514,7 +517,7 @@ class ServiceManager implements ServiceLocatorInterface
             }
 
             if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
-                if ($abstractFactory->canCreate($name)) {
+                if ($abstractFactory->canCreate($this->creationContext, $name)) {
                     $this->factories[$name] = $abstractFactory;
                     return $abstractFactory($this->creationContext, $name, $options);
                 }
@@ -522,6 +525,7 @@ class ServiceManager implements ServiceLocatorInterface
             }
             throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
         }
+        throw ServiceNotFoundException::fromUnknownService($name);
     }
 
     private function applyInitializers($object)
@@ -683,7 +687,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function addAbstractFactory($factory)
     {
-        $this->resolveAbstractFactories([$factory]);
+        $this->abstractFactories[] = $factory;
     }
 
     /**
@@ -708,7 +712,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function addInitializer($initializer)
     {
-        $this->resolveInitializers([$initializer]);
+        $this->initializers[] = $initializer;
     }
 
     /**

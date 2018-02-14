@@ -598,12 +598,12 @@ class ServiceManager implements ServiceLocatorInterface
      * @throws ContainerModificationsNotAllowedException if $alias already
      *     exists as a service and overrides are disallowed.
      */
-    public function setAlias($alias, $target)
+    public function setAlias($name, $target)
     {
-        if (isset($this->services[$alias]) && ! $this->allowOverride) {
-            throw ContainerModificationsNotAllowedException::fromExistingService($alias);
+        if (isset($this->services[$name]) && ! $this->allowOverride) {
+            throw ContainerModificationsNotAllowedException::fromExistingService($name);
         }
-        $this->mapAliasToTarget($alias, $target);
+        $this->mapAliasToTarget($name, $target);
     }
 
     /**

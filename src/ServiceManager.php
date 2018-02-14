@@ -846,12 +846,8 @@ class ServiceManager implements ServiceLocatorInterface
      * @param string[]|Initializer\InitializerInterface[]|callable[] $initializers
      *
      */
-    private function resolveInitializers(array $initializers = null)
+    private function resolveInitializers(array $initializers)
     {
-        if ($initializers === null) {
-            $initializers = $this->initializers;
-            $this->initializers = [];
-        }
         foreach ($initializers as $initializer) {
             if (is_string($initializer) && class_exists($initializer)) {
                 $initializer = new $initializer();

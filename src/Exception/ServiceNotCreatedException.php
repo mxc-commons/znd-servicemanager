@@ -21,7 +21,7 @@ class ServiceNotCreatedException extends SplRuntimeException implements
 {
     public static function fromException($name, $exception)
     {
-        throw new ServiceNotCreatedException(sprintf(
+        return new self(sprintf(
             'Service with name "%s" could not be created. Reason: %s',
             $name,
             $exception->getMessage()

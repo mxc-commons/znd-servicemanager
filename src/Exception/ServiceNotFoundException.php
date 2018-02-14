@@ -18,4 +18,11 @@ class ServiceNotFoundException extends SplInvalidArgumentException implements
     ExceptionInterface,
     NotFoundException
 {
+    public static function fromUnknownService($name)
+    {
+        return new self(sprintf(
+            'Unable to resolve service "%s" to a factory; are you certain you provided it during configuration?',
+            $name
+        ));
+    }
 }

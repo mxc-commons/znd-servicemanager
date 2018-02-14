@@ -25,11 +25,8 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 
 use function array_merge_recursive;
 use function class_exists;
-use function get_class;
-use function gettype;
 use function in_array;
 use function is_callable;
-use function is_object;
 use function is_string;
 use function spl_autoload_register;
 use function spl_object_hash;
@@ -218,7 +215,7 @@ class ServiceManager implements ServiceLocatorInterface
         // We achieve better performance if we can let all alias
         // considerations out.
         if (! $this->aliases) {
-            $object = $this->doCreate($name);
+            $object = $this->createService($name, null);
 
             // Cache the object for later, if it is supposed to be shared.
             if ($sharedService) {
@@ -241,7 +238,7 @@ class ServiceManager implements ServiceLocatorInterface
 
         // At this point, we have to create the object.
         // We use the resolved name for that.
-        $object = $this->doCreate($resolvedName);
+        $object = $this->createService($resolvedName, null);
 
         // Cache the object for later, if it is supposed to be shared.
         if ($sharedService) {
@@ -264,7 +261,7 @@ class ServiceManager implements ServiceLocatorInterface
     {
         // We never cache when using "build".
         $name = $this->aliases[$name] ?? $name;
-        return $this->doCreate($name, $options);
+        return $this->createService($name, $options);
     }
 
     /**
@@ -653,7 +650,7 @@ class ServiceManager implements ServiceLocatorInterface
      * @return object
      * @throws ServiceNotFoundException
      */
-    private function createObjectThroughFactory($name, array $options = null)
+    private function createServiceFromFactory($name, array $options = null)
     {
         $factory = isset($this->factories[$name]) ? $this->factories[$name] : null;
 
@@ -665,24 +662,17 @@ class ServiceManager implements ServiceLocatorInterface
             return $factory($this->creationContext, $name, $options);
         }
 
-        if (! is_callable($factory)) {
-            if (isset($this->invokables[$name])) {
-                $invokable = $this->invokables[$name];
-                return $options === null ? new $invokable() : new $invokable($options);
-            }
-        } else {
-            // PHP 5.6 fails on 'class::method' callables unless we explode them:
-            if (PHP_MAJOR_VERSION < 7
-                && is_string($factory) && strpos($factory, '::') !== false
-            ) {
-                $factory = explode('::', $factory);
-            }
+        if (is_callable($factory)) {
             return $factory($this->creationContext, $name, $options);
+        } elseif (isset($this->invokables[$name])) {
+            $invokable = $this->invokables[$name];
+            return $options === null ? new $invokable() : new $invokable($options);
         }
 
         // Check abstract factories
         foreach ($this->abstractFactories as $abstractFactory) {
             if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                // promote abstract factory to factory
                 $this->factories[$name] = $abstractFactory;
                 return $abstractFactory($this->creationContext, $name, $options);
             }
@@ -699,56 +689,53 @@ class ServiceManager implements ServiceLocatorInterface
      * @param  null|array $options
      * @return object
      */
-    private function createDelegatorFromName($name, array $options = null)
+    private function createServiceFromDelegator($name, array $options = null)
     {
+
+        $creationCallback = $this->delegators[$name]['creation_callback'] ?? null;
+        if ($creationCallback) {
+            $object = $creationCallback($this->creationContext, $name, $creationCallback, $options);
+            return $object;
+        }
         $creationCallback = function () use ($name, $options) {
-            // Code is inlined for performance reason, instead of abstracting the creation
-            return $this->createObjectThroughFactory($name, $options);
+            if ($this->factories[$name]) {
+                return $this->createServiceFromFactory($name, $options);
+            }
+            return $this->createServiceFromAbstractFactory($name, $options);
         };
 
         foreach ($this->delegators[$name] as $index => $delegatorFactory) {
-            $delegatorFactory = $this->delegators[$name][$index];
-
-            if ($delegatorFactory === Proxy\LazyServiceFactory::class) {
-                $delegatorFactory = $this->createLazyServiceDelegatorFactory();
+            if (is_callable($delegatorFactory)) {
+                $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
+                    return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
+                };
+                continue;
             }
 
             if (is_string($delegatorFactory) && class_exists($delegatorFactory)) {
-                $delegatorFactory = new $delegatorFactory();
-            }
-
-            if (! is_callable($delegatorFactory)) {
-                if (is_string($delegatorFactory)) {
-                    throw new ServiceNotCreatedException(sprintf(
-                        'An invalid delegator factory was registered; resolved to class or function "%s"'
-                        . ' which does not exist; please provide a valid function name or class name resolving'
-                        . ' to an implementation of %s',
-                        $delegatorFactory,
-                        DelegatorFactoryInterface::class
-                    ));
+                $delegatorFactory = ($delegatorFactory === Proxy\LazyServiceFactory::class)
+                ? $this->createLazyServiceDelegatorFactory()
+                : new $delegatorFactory();
+                if (is_callable($delegatorFactory)) {
+                    $this->delegators[$name][$index] = $delegatorFactory;
+                    $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
+                        return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
+                    };
+                    continue;
                 }
-
-                throw new ServiceNotCreatedException(sprintf(
-                    'A non-callable delegator, "%s", was provided; expected a callable or instance of "%s"',
-                    is_object($delegatorFactory) ? get_class($delegatorFactory) : gettype($delegatorFactory),
-                    DelegatorFactoryInterface::class
-                ));
             }
-
-            $this->delegators[$name][$index] = $delegatorFactory;
-
-            $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
-                return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
-            };
+            if (is_string($delegatorFactory)) {
+                throw ServiceNotCreatedException::fromInvalidClass($delegatorFactory);
+            }
+            throw ServiceNotCreatedException::fromInvalidInstance($delegatorFactory);
         }
-
+        // cache the callback for later requests
+        $this->delegators[$name]['creationCallback'] = $creationCallback;
         return $creationCallback($this->creationContext, $name, $creationCallback, $options);
     }
 
     /**
      * Create a new instance with an already resolved name
-     *
-     * This is a highly performance sensitive method, do not modify if you have not benchmarked it carefully
      *
      * @param  string     $resolvedName
      * @param  null|array $options
@@ -758,22 +745,18 @@ class ServiceManager implements ServiceLocatorInterface
      *     creating a service.
      * @throws ContainerException if any other error occurs
      */
-    private function doCreate($resolvedName, array $options = null)
+    private function createService($resolvedName, array $options = null)
     {
         try {
-            if (! isset($this->delegators[$resolvedName])) {
-                $object = $this->createObjectThroughFactory($resolvedName, $options);
+            if (isset($this->delegators[$resolvedName])) {
+                $object = $this->createServiceFromDelegator($resolvedName, $options);
             } else {
-                $object = $this->createDelegatorFromName($resolvedName, $options);
+                $object = $this->createServiceFromFactory($resolvedName, $options);
             }
         } catch (ContainerException $exception) {
             throw $exception;
         } catch (Exception $exception) {
-            throw new ServiceNotCreatedException(sprintf(
-                'Service with name "%s" could not be created. Reason: %s',
-                $resolvedName,
-                $exception->getMessage()
-            ), (int) $exception->getCode(), $exception);
+            throw ServiceNotCreatedException::fromException($resolvedName, $exception);
         }
 
         foreach ($this->initializers as $initializer) {

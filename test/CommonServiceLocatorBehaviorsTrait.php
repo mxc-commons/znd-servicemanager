@@ -19,11 +19,14 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\ServiceManager\Initializer\InitializerInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use ZendTest\ServiceManager\TestAsset\AbstractFactoryFoo;
 use ZendTest\ServiceManager\TestAsset\CallTimesAbstractFactory;
 use ZendTest\ServiceManager\TestAsset\FailingAbstractFactory;
 use ZendTest\ServiceManager\TestAsset\FailingExceptionWithStringAsCodeFactory;
 use ZendTest\ServiceManager\TestAsset\FailingFactory;
 use ZendTest\ServiceManager\TestAsset\InvokableObject;
+use ZendTest\ServiceManager\TestAsset\PassthroughDelegatorFactory;
+use ZendTest\ServiceManager\TestAsset\SampleFactory;
 use ZendTest\ServiceManager\TestAsset\SimpleAbstractFactory;
 
 use function call_user_func_array;
@@ -587,7 +590,7 @@ trait CommonServiceLocatorBehaviorsTrait
 
     /**
      * @dataProvider invalidDelegators
-     * @covers \Zend\ServiceManager\ServiceManager::createDelegatorFromName
+     * @covers \Zend\ServiceManager\ServiceManager::createServiceFromDelegator
      */
     public function testInvalidDelegatorShouldRaiseExceptionDuringCreation(
         $delegator,

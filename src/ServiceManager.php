@@ -152,14 +152,6 @@ class ServiceManager implements ServiceLocatorInterface
      */
     protected $configured = false;
 
-
-    /**
-     * Cached abstract factories from string.
-     *
-     * @var array
-     */
-    private $cachedAbstractFactories = [];
-
     /**
      * Constructor.
      *
@@ -175,12 +167,6 @@ class ServiceManager implements ServiceLocatorInterface
         if (! empty($this->aliases)) {
             $this->mapAliasesToTargets();
         }
-
-        $config['initializers'] = array_merge($this->initializers, $config['initializers'] ?? []);
-        $this->initializers = [];
-
-        $config['abstract_factories'] = array_merge($this->abstractFactories, $config['abstract_factories'] ?? []);
-        $this->abstractFactories = [];
 
         $this->configure($config);
     }
@@ -352,11 +338,13 @@ class ServiceManager implements ServiceLocatorInterface
         // For abstract factories and initializers, we always directly
         // instantiate them to avoid checks during service construction.
         if (! empty($config['abstract_factories'])) {
-            $this->resolveAbstractFactories($config['abstract_factories']);
+            $this->abstractFactories = $config['abstract_factories'] + $this->abstractFactories;
+            //$this->resolveAbstractFactories($config['abstract_factories']);
         }
 
         if (! empty($config['initializers'])) {
-            $this->resolveInitializers($config['initializers']);
+            $this->initializers = $config[$initializers] + $this->initializers;
+//            $this->resolveInitializers($config['initializers']);
         }
         $this->configured = true;
         return $this;
@@ -474,9 +462,7 @@ class ServiceManager implements ServiceLocatorInterface
             throw ServiceNotCreatedException::fromException($resolvedName, $exception);
         }
 
-        foreach ($this->initializers as $initializer) {
-            $initializer($this->creationContext, $object);
-        }
+        $this->applyInitializers($object);
 
         return $object;
     }
@@ -518,6 +504,40 @@ class ServiceManager implements ServiceLocatorInterface
         }
 
         throw ServiceNotFoundException::fromUnknownService($name);
+    }
+
+    private function createServiceFromAbstractFactory($name, array $options = null)
+    {
+        foreach ($this->abstractFactories as $idx => $abstractFactory) {
+            if (is_string($abstractFactory) && class_exists($abstractFactory)) {
+                $abstractFactory = new $abstractFactory();
+                $this->abstractFactories[$idx] = $abstractFactory;
+            }
+
+            if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+                if ($abstractFactory->canCreate($name)) {
+                    $this->factories[$name] = $abstractFactory;
+                    return $abstractFactory($this->creationContext, $name, $options);
+                }
+                continue;
+            }
+            throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
+        }
+    }
+
+    private function applyInitializers($object)
+    {
+        foreach ($this->initializers as $idx => $initializer) {
+            if (is_string($initializer) && class_exists($initializer)) {
+                $initializer = new $initializer();
+            }
+
+            if (is_callable($initializer)) {
+                $this->initializers[$idx] = $initializer;
+                continue;
+            }
+            throw InvalidArgumentException::fromInvalidInitializer($initializer);
+        }
     }
 
     /**
@@ -810,55 +830,6 @@ class ServiceManager implements ServiceLocatorInterface
                 $this->aliases[$alias] = $tCursor;
                 $tagged[$alias] = true;
             }
-        }
-    }
-
-    /**
-     * Instantiate abstract factories in order to avoid checks during service construction.
-     *
-     * @param string[]|Factory\AbstractFactoryInterface[] $abstractFactories
-     */
-    private function resolveAbstractFactories(array $abstractFactories)
-    {
-        foreach ($abstractFactories as $abstractFactory) {
-            if (is_string($abstractFactory) && class_exists($abstractFactory)) {
-                // cached string
-                if (! isset($this->cachedAbstractFactories[$abstractFactory])) {
-                    $this->cachedAbstractFactories[$abstractFactory] = new $abstractFactory();
-                }
-
-                $abstractFactory = $this->cachedAbstractFactories[$abstractFactory];
-            }
-
-            if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
-                $abstractFactoryObjHash = spl_object_hash($abstractFactory);
-                $this->abstractFactories[$abstractFactoryObjHash] = $abstractFactory;
-                continue;
-            }
-
-            throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
-        }
-    }
-
-    /**
-     * Instantiate initializers for to avoid checks during service construction.
-     *
-     * @param string[]|Initializer\InitializerInterface[]|callable[] $initializers
-     *
-     */
-    private function resolveInitializers(array $initializers)
-    {
-        foreach ($initializers as $initializer) {
-            if (is_string($initializer) && class_exists($initializer)) {
-                $initializer = new $initializer();
-            }
-
-            if (is_callable($initializer)) {
-                $this->initializers[] = $initializer;
-                return;
-            }
-
-            throw InvalidArgumentException::fromInvalidInitializer($initializer);
         }
     }
 

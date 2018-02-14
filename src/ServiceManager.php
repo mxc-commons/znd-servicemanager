@@ -82,6 +82,11 @@ class ServiceManager implements ServiceLocatorInterface
     protected $delegators = [];
 
     /**
+     * @var callable[]
+     */
+    protected $delegatorCallbackCache = [];
+
+    /**
      * A list of factories (either as string name or callable)
      *
      * @var string[]|callable[]
@@ -181,21 +186,180 @@ class ServiceManager implements ServiceLocatorInterface
     }
 
     /**
-     * Implemented for backwards compatibility with previous plugin managers only.
+     * Configure the service manager
      *
-     * Returns the creation context.
+     * Valid top keys are:
      *
-     * @deprecated since 3.0.0. Factories using 3.0 should use the container
-     *     instance passed to the factory instead.
-     * @return ContainerInterface
+     * - services: service name => service instance pairs
+     * - invokables: service name => class name pairs for classes that do not
+     *   have required constructor arguments; internally, maps the class to an
+     *   InvokableFactory instance, and creates an alias if the service name
+     *   and class name do not match.
+     * - factories: service name => factory pairs; factories may be any
+     *   callable, string name resolving to an invokable class, or string name
+     *   resolving to a FactoryInterface instance.
+     * - abstract_factories: an array of abstract factories; these may be
+     *   instances of AbstractFactoryInterface, or string names resolving to
+     *   classes that implement that interface.
+     * - delegators: service name => list of delegator factories for the given
+     *   service; each item in the list may be a callable, a string name
+     *   resolving to an invokable class, or a string name resolving to a class
+     *   implementing DelegatorFactoryInterface.
+     * - shared: service name => flag pairs; the flag is a boolean indicating
+     *   whether or not the service is shared.
+     * - aliases: alias => service name pairs.
+     * - lazy_services: lazy service configuration; can contain the keys:
+     *   - class_map: service name => class name pairs.
+     *   - proxies_namespace: string namespace to use for generated proxy
+     *     classes.
+     *   - proxies_target_dir: directory in which to write generated proxy
+     *     classes; uses system temporary by default.
+     *   - write_proxy_files: boolean indicating whether generated proxy
+     *     classes should be written; defaults to boolean false.
+     * - shared_by_default: boolean, indicating if services in this instance
+     *   should be shared by default.
+     *
+     * @param  array $config
+     * @return self
+     * @throws ContainerModificationsNotAllowedException if the allow
+     *     override flag has been toggled off, and a service instance
+     *     exists for a given service.
      */
-    public function getServiceLocator()
+    public function configure(array $config)
     {
-        trigger_error(sprintf(
-            'Usage of %s is deprecated since v3.0.0; please use the container passed to the factory instead',
-            __METHOD__
-        ), E_USER_DEPRECATED);
-        return $this->creationContext;
+        $allowOverride = empty($this->services) || $this->allowOverride;
+
+        if ($allowOverride) {
+            // This is the fast track. We can just merge.
+            if (! empty($config['services'])) {
+                $this->services = $config['services'] + $this->services;
+            }
+            if (! empty($config['aliases'])) {
+                $this->aliases = $config['aliases'] + $this->aliases;
+                $this->mapAliasesToTargets();
+            }
+            if (! empty($config['delegators'])) {
+                $this->delegators = array_merge_recursive($this->delegators, $config['delegators']);
+                $this->delegatorCallbackCache = [];
+            }
+            if (! empty($config['factories'])) {
+                $this->factories = $config['factories'] + $this->factories;
+            }
+            if (! empty($config['invokables'])) {
+                $this->invokables = $config['invokables'] + $this->invokables;
+            }
+            if (! empty($config['shared'])) {
+                $this->shared = $config['shared'] + $this->shared;
+            }
+            if (! empty($config['lazy_services']['class_map'])) {
+                $this->lazyServices['class_map'] = isset($this->lazyServices['class_map'])
+                ? $config['lazy_services']['class_map'] + $this->lazyServices['class_map']
+                : $config['lazy_services']['class_map'];
+                $this->lazyServicesDelegator = null;
+                // we merge the rest of lazy_services later
+                unset($config['lazy_services']['class_map']);
+            }
+        } else {
+            if (! empty($config['services'])) {
+                foreach ($config['services'] as $name => $service) {
+                    // If allowOverride was false, we are here because $this->services was not empty,
+                    // so checking $this->services only is sufficient obviously.
+                    // If $this->services was not empty, we are here because $this->allowOverride was false,
+                    // so checking $this->services only is sufficient, also.
+                    if (isset($this->services[$name])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
+                    }
+                    // @todo: Question is, if we are allowed to overwrite services
+                    // registered in this loop from within the following clauses of this else
+                    // branch or if this new services should become override protected immediately
+                    // if $this->allowOverride is false.
+                    $this->services[$name] = $service;
+                }
+            }
+            // Assuming that the services registered above need override protection immediately, we continue
+            // protecting the newly registered services from the loop above like the services we already
+            // knew before configure() was called. This behaviour is different from the implementation
+            // before, but all tests pass.
+            // If the old behaviour should get maintained, I would simply move the foreach($config['services'])
+            // loop to the end of the else branch.
+            if (! empty($config['aliases'])) {
+                foreach ($config['aliases'] as $alias => $target) {
+                    if (isset($this->services[$alias])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($alias);
+                    }
+                    $this->aliases[$alias] = $target;
+                }
+                $this->mapAliasesToTargets();
+            }
+            if (! empty($config['delegators'])) {
+                foreach ($config['delegators'] as $name => $delegator) {
+                    if (isset($this->services[$name])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
+                    }
+                    unset($this->delegatorCallbackCache[$name]);
+                }
+                // @todo: resolve that within the loop
+                $this->delegators = array_merge_recursive($config['delegators'], $this->delegators);
+            }
+            if (! empty($config['factories'])) {
+                foreach ($config['factories'] as $name => $factory) {
+                    if (isset($this->services[$name])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
+                    }
+                    $this->factories[$name] = $factory;
+                }
+            }
+            if (! empty($config['invokables'])) {
+                foreach ($config['invokables'] as $name => $service) {
+                    if (isset($this->services[$name])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
+                    }
+                    $this->invokables[$name] = $service;
+                }
+            }
+
+            if (! empty($config['shared'])) {
+                foreach ($config['shared'] as $name => $shared) {
+                    if (isset($this->services[$name])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
+                    }
+                    $this->shared[$name] = $shared;
+                }
+            }
+            // If lazy service configuration was provided, reset the lazy services
+            // delegator factory.
+            if (! empty($config['lazy_services']['class_map'])) {
+                foreach ($config['lazy_services']['class_map'] as $name => $service) {
+                    if (isset($this->services[$name])) {
+                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
+                    }
+                    $this->lazyServices['class_map'][$name] = $service;
+                }
+                $this->lazyServicesDelegator = null;
+                // we merge the rest of lazy_services later
+                unset($config['lazy_services']['class_map']);
+            }
+        }
+        // we merge the rest of supplied lazy_services if present
+        if (! empty($config['lazy_services'])) {
+            $this->lazyServices = $config['lazy_services'] + $this->lazyServices;
+        }
+
+        if (isset($config['shared_by_default'])) {
+            $this->sharedByDefault = $config['shared_by_default'];
+        }
+
+        // For abstract factories and initializers, we always directly
+        // instantiate them to avoid checks during service construction.
+        if (! empty($config['abstract_factories'])) {
+            $this->resolveAbstractFactories($config['abstract_factories']);
+        }
+
+        if (! empty($config['initializers'])) {
+            $this->resolveInitializers($config['initializers']);
+        }
+        $this->configured = true;
+        return $this;
     }
 
     /**
@@ -270,14 +434,12 @@ class ServiceManager implements ServiceLocatorInterface
     public function has($name)
     {
         $resolvedName = $this->aliases[$name] ?? $name;
-        // Check services and factories first to speedup the most common requests.
         if (isset($this->services[$resolvedName])
             || isset($this->factories[$resolvedName])
             || isset($this->invokables[$resolvedName])) {
             return true;
         }
 
-        // Check abstract factories next.
         foreach ($this->abstractFactories as $abstractFactory) {
             if ($abstractFactory->canCreate($this->creationContext, $resolvedName)) {
                 $this->factories[$resolvedName] = $abstractFactory;
@@ -285,6 +447,127 @@ class ServiceManager implements ServiceLocatorInterface
             }
         }
         return false;
+    }
+
+    /**
+     * Create a new instance with an already resolved name
+     *
+     * @param  string     $resolvedName
+     * @param  null|array $options
+     * @return mixed
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    private function createService($resolvedName, array $options = null)
+    {
+        try {
+            if (isset($this->delegators[$resolvedName])) {
+                $object = $this->createServiceFromDelegator($resolvedName, $options);
+            } else {
+                $object = $this->createServiceFromFactory($resolvedName, $options);
+            }
+        } catch (ContainerException $exception) {
+            throw $exception;
+        } catch (Exception $exception) {
+            throw ServiceNotCreatedException::fromException($resolvedName, $exception);
+        }
+
+        foreach ($this->initializers as $initializer) {
+            $initializer($this->creationContext, $object);
+        }
+
+        return $object;
+    }
+
+    /**
+     * Get a factory for the given service name and create an object using
+     * that factory or create invokable if service is invokable
+     *
+     * @param  string $name
+     * @return object
+     * @throws ServiceNotFoundException
+     */
+    private function createServiceFromFactory($name, array $options = null)
+    {
+        $factory = isset($this->factories[$name]) ? $this->factories[$name] : null;
+
+        if (is_string($factory) && class_exists($factory)) {
+            $factory = new $factory();
+            if (is_callable($factory)) {
+                $this->factories[$name] = $factory;
+            }
+            return $factory($this->creationContext, $name, $options);
+        }
+
+        if (is_callable($factory)) {
+            return $factory($this->creationContext, $name, $options);
+        } elseif (isset($this->invokables[$name])) {
+            $invokable = $this->invokables[$name];
+            return $options === null ? new $invokable() : new $invokable($options);
+        }
+
+        // Check abstract factories
+        foreach ($this->abstractFactories as $abstractFactory) {
+            if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                // promote abstract factory to factory
+                $this->factories[$name] = $abstractFactory;
+                return $abstractFactory($this->creationContext, $name, $options);
+            }
+        }
+
+        throw ServiceNotFoundException::fromUnknownService($name);
+    }
+
+    /**
+     * @param  string     $name
+     * @param  null|array $options
+     * @return object
+     */
+    private function createServiceFromDelegator($name, array $options = null)
+    {
+
+        $creationCallback = $this->delegatorCallbackCache[$name] ?? null;
+        if ($creationCallback) {
+            $object = $creationCallback($this->creationContext, $name, $creationCallback, $options);
+            return $object;
+        }
+        $creationCallback = function () use ($name, $options) {
+            if ($this->factories[$name]) {
+                return $this->createServiceFromFactory($name, $options);
+            }
+            return $this->createServiceFromAbstractFactory($name, $options);
+        };
+
+        foreach ($this->delegators[$name] as $index => $delegatorFactory) {
+            if (is_callable($delegatorFactory)) {
+                $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
+                    return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
+                };
+                continue;
+            }
+
+            if (is_string($delegatorFactory) && class_exists($delegatorFactory)) {
+                $delegatorFactory = ($delegatorFactory === Proxy\LazyServiceFactory::class)
+                ? $this->createLazyServiceDelegatorFactory()
+                : new $delegatorFactory();
+                if (is_callable($delegatorFactory)) {
+                    $this->delegators[$name][$index] = $delegatorFactory;
+                    $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
+                        return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
+                    };
+                    continue;
+                }
+            }
+            if (is_string($delegatorFactory)) {
+                throw ServiceNotCreatedException::fromInvalidClass($delegatorFactory);
+            }
+            throw ServiceNotCreatedException::fromInvalidInstance($delegatorFactory);
+        }
+        // cache the callback for later requests
+        $this->delegatorCallbackCache[$name] = $creationCallback;
+        return $creationCallback($this->creationContext, $name, $creationCallback, $options);
     }
 
     /**
@@ -305,181 +588,6 @@ class ServiceManager implements ServiceLocatorInterface
     public function getAllowOverride()
     {
         return $this->allowOverride;
-    }
-
-    /**
-     * Configure the service manager
-     *
-     * Valid top keys are:
-     *
-     * - services: service name => service instance pairs
-     * - invokables: service name => class name pairs for classes that do not
-     *   have required constructor arguments; internally, maps the class to an
-     *   InvokableFactory instance, and creates an alias if the service name
-     *   and class name do not match.
-     * - factories: service name => factory pairs; factories may be any
-     *   callable, string name resolving to an invokable class, or string name
-     *   resolving to a FactoryInterface instance.
-     * - abstract_factories: an array of abstract factories; these may be
-     *   instances of AbstractFactoryInterface, or string names resolving to
-     *   classes that implement that interface.
-     * - delegators: service name => list of delegator factories for the given
-     *   service; each item in the list may be a callable, a string name
-     *   resolving to an invokable class, or a string name resolving to a class
-     *   implementing DelegatorFactoryInterface.
-     * - shared: service name => flag pairs; the flag is a boolean indicating
-     *   whether or not the service is shared.
-     * - aliases: alias => service name pairs.
-     * - lazy_services: lazy service configuration; can contain the keys:
-     *   - class_map: service name => class name pairs.
-     *   - proxies_namespace: string namespace to use for generated proxy
-     *     classes.
-     *   - proxies_target_dir: directory in which to write generated proxy
-     *     classes; uses system temporary by default.
-     *   - write_proxy_files: boolean indicating whether generated proxy
-     *     classes should be written; defaults to boolean false.
-     * - shared_by_default: boolean, indicating if services in this instance
-     *   should be shared by default.
-     *
-     * @param  array $config
-     * @return self
-     * @throws ContainerModificationsNotAllowedException if the allow
-     *     override flag has been toggled off, and a service instance
-     *     exists for a given service.
-     */
-    public function configure(array $config)
-    {
-        $allowOverride = empty($this->services) || $this->allowOverride;
-
-        if ($allowOverride) {
-                // This is the fast track. We can just merge.
-            if (! empty($config['services'])) {
-                $this->services = $config['services'] + $this->services;
-            }
-            if (! empty($config['aliases'])) {
-                $this->aliases = $config['aliases'] + $this->aliases;
-                $this->mapAliasesToTargets();
-            }
-            if (! empty($config['delegators'])) {
-                $this->delegators = array_merge_recursive($this->delegators, $config['delegators']);
-            }
-            if (! empty($config['factories'])) {
-                $this->factories = $config['factories'] + $this->factories;
-            }
-            if (! empty($config['invokables'])) {
-                $this->invokables = $config['invokables'] + $this->invokables;
-            }
-            if (! empty($config['shared'])) {
-                $this->shared = $config['shared'] + $this->shared;
-            }
-            if (! empty($config['lazy_services']['class_map'])) {
-                $this->lazyServices['class_map'] = isset($this->lazyServices['class_map'])
-                    ? $config['lazy_services']['class_map'] + $this->lazyServices['class_map']
-                    : $config['lazy_services']['class_map'];
-                $this->lazyServicesDelegator = null;
-                // we merge the rest of lazy_services later
-                unset($config['lazy_services']['class_map']);
-            }
-        } else {
-            if (! empty($config['services'])) {
-                foreach ($config['services'] as $name => $service) {
-                    // If allowOverride was false, we are here because $this->services was not empty,
-                    // so checking $this->services only is sufficient obviously.
-                    // If $this->services was not empty, we are here because $this->allowOverride was false,
-                    // so checking $this->services only is sufficient, also.
-                    if (isset($this->services[$name])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
-                    }
-                    // @todo: Question is, if we are allowed to overwrite services
-                    // registered in this loop from within the following clauses of this else
-                    // branch or if this new services should become override protected immediately
-                    // if $this->allowOverride is false.
-                    $this->services[$name] = $service;
-                }
-            }
-            // Assuming that the services registered above need override protection immediately, we continue
-            // protecting the newly registered services from the loop above like the services we already
-            // knew before configure() was called. This behaviour is different from the implementation
-            // before, but all tests pass.
-            // If the old behaviour should get maintained, I would simply move the foreach($config['services'])
-            // loop to the end of the else branch.
-            if (! empty($config['aliases'])) {
-                foreach ($config['aliases'] as $alias => $target) {
-                    if (isset($this->services[$alias])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($alias);
-                    }
-                    $this->aliases[$alias] = $target;
-                }
-                $this->mapAliasesToTargets();
-            }
-            if (! empty($config['delegators'])) {
-                foreach ($config['delegators'] as $name => $delegator) {
-                    if (isset($this->services[$name])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
-                    }
-                }
-                // @todo: resolve that within the loop
-                $this->delegators = array_merge_recursive($config['delegators'], $this->delegators);
-            }
-            if (! empty($config['factories'])) {
-                foreach ($config['factories'] as $name => $factory) {
-                    if (isset($this->services[$name])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
-                    }
-                    $this->factories[$name] = $factory;
-                }
-            }
-            if (! empty($config['invokables'])) {
-                foreach ($config['invokables'] as $name => $service) {
-                    if (isset($this->services[$name])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
-                    }
-                    $this->invokables[$name] = $service;
-                }
-            }
-
-            if (! empty($config['shared'])) {
-                foreach ($config['shared'] as $name => $shared) {
-                    if (isset($this->services[$name])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
-                    }
-                    $this->shared[$name] = $shared;
-                }
-            }
-            // If lazy service configuration was provided, reset the lazy services
-            // delegator factory.
-            if (! empty($config['lazy_services']['class_map'])) {
-                foreach ($config['lazy_services']['class_map'] as $name => $service) {
-                    if (isset($this->services[$name])) {
-                        throw ContainerModificationsNotAllowedException::fromExistingService($name);
-                    }
-                    $this->lazyServices['class_map'][$name] = $service;
-                }
-                $this->lazyServicesDelegator = null;
-                // we merge the rest of lazy_services later
-                unset($config['lazy_services']['class_map']);
-            }
-        }
-        // we merge the rest of supplied lazy_services if present
-        if (! empty($config['lazy_services'])) {
-            $this->lazyServices = $config['lazy_services'] + $this->lazyServices;
-        }
-
-        if (isset($config['shared_by_default'])) {
-            $this->sharedByDefault = $config['shared_by_default'];
-        }
-
-        // For abstract factories and initializers, we always directly
-        // instantiate them to avoid checks during service construction.
-        if (! empty($config['abstract_factories'])) {
-            $this->resolveAbstractFactories($config['abstract_factories']);
-        }
-
-        if (! empty($config['initializers'])) {
-            $this->resolveInitializers($config['initializers']);
-        }
-        $this->configured = true;
-        return $this;
     }
 
     /**
@@ -617,201 +725,6 @@ class ServiceManager implements ServiceLocatorInterface
     }
 
     /**
-     * Instantiate initializers for to avoid checks during service construction.
-     *
-     * @param string[]|Initializer\InitializerInterface[]|callable[] $initializers
-     *
-     */
-    private function resolveInitializers(array $initializers = null)
-    {
-        if ($initializers === null) {
-            $initializers = $this->initializers;
-            $this->initializers = [];
-        }
-        foreach ($initializers as $initializer) {
-            if (is_string($initializer) && class_exists($initializer)) {
-                $initializer = new $initializer();
-            }
-
-            if (is_callable($initializer)) {
-                $this->initializers[] = $initializer;
-                return;
-            }
-
-            throw InvalidArgumentException::fromInvalidInitializer($initializer);
-        }
-    }
-
-    /**
-     * Get a factory for the given service name and create an object using
-     * that factory or create invokable if service is invokable
-     *
-     * @param  string $name
-     * @return object
-     * @throws ServiceNotFoundException
-     */
-    private function createServiceFromFactory($name, array $options = null)
-    {
-        $factory = isset($this->factories[$name]) ? $this->factories[$name] : null;
-
-        if (is_string($factory) && class_exists($factory)) {
-            $factory = new $factory();
-            if (is_callable($factory)) {
-                $this->factories[$name] = $factory;
-            }
-            return $factory($this->creationContext, $name, $options);
-        }
-
-        if (is_callable($factory)) {
-            return $factory($this->creationContext, $name, $options);
-        } elseif (isset($this->invokables[$name])) {
-            $invokable = $this->invokables[$name];
-            return $options === null ? new $invokable() : new $invokable($options);
-        }
-
-        // Check abstract factories
-        foreach ($this->abstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($this->creationContext, $name)) {
-                // promote abstract factory to factory
-                $this->factories[$name] = $abstractFactory;
-                return $abstractFactory($this->creationContext, $name, $options);
-            }
-        }
-
-        throw ServiceNotFoundException::fromUnknownService($name);
-    }
-
-    /**
-     * @param  string     $name
-     * @param  null|array $options
-     * @return object
-     */
-    private function createServiceFromDelegator($name, array $options = null)
-    {
-
-        $creationCallback = $this->delegators[$name]['creation_callback'] ?? null;
-        if ($creationCallback) {
-            $object = $creationCallback($this->creationContext, $name, $creationCallback, $options);
-            return $object;
-        }
-        $creationCallback = function () use ($name, $options) {
-            if ($this->factories[$name]) {
-                return $this->createServiceFromFactory($name, $options);
-            }
-            return $this->createServiceFromAbstractFactory($name, $options);
-        };
-
-        foreach ($this->delegators[$name] as $index => $delegatorFactory) {
-            if (is_callable($delegatorFactory)) {
-                $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
-                    return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
-                };
-                continue;
-            }
-
-            if (is_string($delegatorFactory) && class_exists($delegatorFactory)) {
-                $delegatorFactory = ($delegatorFactory === Proxy\LazyServiceFactory::class)
-                ? $this->createLazyServiceDelegatorFactory()
-                : new $delegatorFactory();
-                if (is_callable($delegatorFactory)) {
-                    $this->delegators[$name][$index] = $delegatorFactory;
-                    $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
-                        return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
-                    };
-                    continue;
-                }
-            }
-            if (is_string($delegatorFactory)) {
-                throw ServiceNotCreatedException::fromInvalidClass($delegatorFactory);
-            }
-            throw ServiceNotCreatedException::fromInvalidInstance($delegatorFactory);
-        }
-        // cache the callback for later requests
-        $this->delegators[$name]['creationCallback'] = $creationCallback;
-        return $creationCallback($this->creationContext, $name, $creationCallback, $options);
-    }
-
-    /**
-     * Create a new instance with an already resolved name
-     *
-     * @param  string     $resolvedName
-     * @param  null|array $options
-     * @return mixed
-     * @throws ServiceNotFoundException if unable to resolve the service.
-     * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
-     */
-    private function createService($resolvedName, array $options = null)
-    {
-        try {
-            if (isset($this->delegators[$resolvedName])) {
-                $object = $this->createServiceFromDelegator($resolvedName, $options);
-            } else {
-                $object = $this->createServiceFromFactory($resolvedName, $options);
-            }
-        } catch (ContainerException $exception) {
-            throw $exception;
-        } catch (Exception $exception) {
-            throw ServiceNotCreatedException::fromException($resolvedName, $exception);
-        }
-
-        foreach ($this->initializers as $initializer) {
-            $initializer($this->creationContext, $object);
-        }
-
-        return $object;
-    }
-
-    /**
-     * Create the lazy services delegator factory.
-     *
-     * Creates the lazy services delegator factory based on the lazy_services
-     * configuration present.
-     *
-     * @return Proxy\LazyServiceFactory
-     * @throws ServiceNotCreatedException when the lazy service class_map
-     *     configuration is missing
-     */
-    private function createLazyServiceDelegatorFactory()
-    {
-        if ($this->lazyServicesDelegator) {
-            return $this->lazyServicesDelegator;
-        }
-
-        if (! isset($this->lazyServices['class_map'])) {
-            throw new ServiceNotCreatedException('Missing "class_map" config key in "lazy_services"');
-        }
-
-        $factoryConfig = new ProxyConfiguration();
-
-        if (isset($this->lazyServices['proxies_namespace'])) {
-            $factoryConfig->setProxiesNamespace($this->lazyServices['proxies_namespace']);
-        }
-
-        if (isset($this->lazyServices['proxies_target_dir'])) {
-            $factoryConfig->setProxiesTargetDir($this->lazyServices['proxies_target_dir']);
-        }
-
-        if (! isset($this->lazyServices['write_proxy_files']) || ! $this->lazyServices['write_proxy_files']) {
-            $factoryConfig->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
-        } else {
-            $factoryConfig->setGeneratorStrategy(new FileWriterGeneratorStrategy(
-                new FileLocator($factoryConfig->getProxiesTargetDir())
-            ));
-        }
-
-        spl_autoload_register($factoryConfig->getProxyAutoloader());
-
-        $this->lazyServicesDelegator = new Proxy\LazyServiceFactory(
-            new LazyLoadingValueHolderFactory($factoryConfig),
-            $this->lazyServices['class_map']
-        );
-
-        return $this->lazyServicesDelegator;
-    }
-
-    /**
      * Assuming that the alias name is valid (see above) resolve/add it.
      *
      * This is done differently from bulk mapping aliases for performance reasons, as the
@@ -925,5 +838,99 @@ class ServiceManager implements ServiceLocatorInterface
 
             throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
         }
+    }
+
+    /**
+     * Instantiate initializers for to avoid checks during service construction.
+     *
+     * @param string[]|Initializer\InitializerInterface[]|callable[] $initializers
+     *
+     */
+    private function resolveInitializers(array $initializers = null)
+    {
+        if ($initializers === null) {
+            $initializers = $this->initializers;
+            $this->initializers = [];
+        }
+        foreach ($initializers as $initializer) {
+            if (is_string($initializer) && class_exists($initializer)) {
+                $initializer = new $initializer();
+            }
+
+            if (is_callable($initializer)) {
+                $this->initializers[] = $initializer;
+                return;
+            }
+
+            throw InvalidArgumentException::fromInvalidInitializer($initializer);
+        }
+    }
+
+    /**
+     * Create the lazy services delegator factory.
+     *
+     * Creates the lazy services delegator factory based on the lazy_services
+     * configuration present.
+     *
+     * @return Proxy\LazyServiceFactory
+     * @throws ServiceNotCreatedException when the lazy service class_map
+     *     configuration is missing
+     */
+    private function createLazyServiceDelegatorFactory()
+    {
+        // @todo: As a matter of separation of concerns this factory
+        // was better be implemented in a separate class
+        if ($this->lazyServicesDelegator) {
+            return $this->lazyServicesDelegator;
+        }
+
+        if (! isset($this->lazyServices['class_map'])) {
+            throw new ServiceNotCreatedException('Missing "class_map" config key in "lazy_services"');
+        }
+
+        $factoryConfig = new ProxyConfiguration();
+
+        if (isset($this->lazyServices['proxies_namespace'])) {
+            $factoryConfig->setProxiesNamespace($this->lazyServices['proxies_namespace']);
+        }
+
+        if (isset($this->lazyServices['proxies_target_dir'])) {
+            $factoryConfig->setProxiesTargetDir($this->lazyServices['proxies_target_dir']);
+        }
+
+        if (! isset($this->lazyServices['write_proxy_files']) || ! $this->lazyServices['write_proxy_files']) {
+            $factoryConfig->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
+        } else {
+            $factoryConfig->setGeneratorStrategy(new FileWriterGeneratorStrategy(
+                new FileLocator($factoryConfig->getProxiesTargetDir())
+            ));
+        }
+
+        spl_autoload_register($factoryConfig->getProxyAutoloader());
+
+        $this->lazyServicesDelegator = new Proxy\LazyServiceFactory(
+            new LazyLoadingValueHolderFactory($factoryConfig),
+            $this->lazyServices['class_map']
+        );
+
+        return $this->lazyServicesDelegator;
+    }
+
+    /**
+     * Implemented for backwards compatibility with previous plugin managers only.
+     *
+     * Returns the creation context.
+     *
+     * @deprecated since 3.0.0. Factories using 3.0 should use the container
+     *     instance passed to the factory instead.
+     * @return ContainerInterface
+     */
+    public function getServiceLocator()
+    {
+        trigger_error(sprintf(
+            'Usage of %s is deprecated since v3.0.0; please use the container passed to the factory instead',
+            __METHOD__
+        ), E_USER_DEPRECATED);
+        return $this->creationContext;
     }
 }

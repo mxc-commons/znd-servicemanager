@@ -73,7 +73,7 @@ class ServiceManagerTest extends TestCase
 
     /**
      * @covers \Zend\ServiceManager\ServiceManager::doCreate
-     * @covers \Zend\ServiceManager\ServiceManager::createDelegatorFromName
+     * @covers \Zend\ServiceManager\ServiceManager::createServiceFromDelegator
      */
     public function testCanWrapCreationInDelegators()
     {

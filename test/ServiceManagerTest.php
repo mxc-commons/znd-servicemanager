@@ -8,6 +8,7 @@
 namespace ZendTest\ServiceManager;
 
 use DateTime;
+use PHPUnit\Framework\MockObject\Invokable;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use stdClass;
@@ -15,9 +16,12 @@ use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\ServiceManager\ServiceManager;
+use ZendTest\ServiceManager\TestAsset\Foo;
 use ZendTest\ServiceManager\TestAsset\InvokableObject;
+use ZendTest\ServiceManager\TestAsset\PreconfiguredServiceManager;
+use ZendTest\ServiceManager\TestAsset\SampleFactory;
 use ZendTest\ServiceManager\TestAsset\SimpleServiceManager;
-use PHPUnit\Framework\MockObject\Invokable;
+use ZendTest\ServiceManager\TestAsset\TaggingDelegatorFactory;
 
 /**
  * @covers \Zend\ServiceManager\ServiceManager

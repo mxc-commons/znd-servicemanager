@@ -678,10 +678,7 @@ class ServiceManager implements ServiceLocatorInterface
             }
         }
 
-        throw new ServiceNotFoundException(sprintf(
-            'Unable to resolve service "%s" to a factory; are you certain you provided it during configuration?',
-            $name
-        ));
+        throw ServiceNotFoundException::fromUnknownService($name);
     }
 
     /**

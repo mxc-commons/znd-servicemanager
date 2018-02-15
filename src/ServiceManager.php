@@ -20,7 +20,7 @@ use Zend\ServiceManager\Exception\ContainerModificationsNotAllowedException;
 use Zend\ServiceManager\Exception\CyclicAliasException;
 use Zend\ServiceManager\Exception\InvalidArgumentException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\Exception\oundException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 use function array_merge_recursive;
@@ -30,9 +30,7 @@ use function is_callable;
 use function is_string;
 use function spl_autoload_register;
 use function spl_object_hash;
-use function sf;
 use function trigger_error;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
 
 /**
  * Service Manager.

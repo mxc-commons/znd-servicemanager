@@ -131,130 +131,112 @@ which can cause that invokable definitions can inadvertently overwrite delegator
 
 ## Benchmark Comparisons
 
-For your convenience you will find benchmark comparisons of zend-servicemanager:master and mxc-servicemanager:master below. This section will be updated from time to time when new versions come up on either side.
+0.2.0 readyness: Updated benchmarks for new releas 0.2.0
 
-Significant performance improvements currently are the creation of a new ServiceManager with several thousand
-items via call to `configure()` (3x faster) and service creation via the setter APIs (setService, setAlias, ...) which is between minimum 1.3x and maximum 18.0x as fast as zend-servicemanager. Most other sections profit a bit from the refactored handling of invokable and aliases.
+    $ vendor\bin\phpbench report --file=..\master.all.xml --file=..\all.020.xml --report="compare"
+    benchmark: AbstractFactoryCacheBench
+    +-------------------------------------------+-------------------+------------------+
+    | subject                                   | suite:master:mean | suite:0.2.0:mean |
+    +-------------------------------------------+-------------------+------------------+
+    | benchGetViaAbstractFactory                | 2.361µs           | 4.470µs          | <- price of creating abstract factories on demand
+    | benchGetViaCachedAbstractFactory          | 2.405µs           | 1.920µs          | <- real performance benefit
+    | benchIfHasThenGetViaAbstractFactory       | 2.982µs           | 4.861µs          | <- price of creating abstract factories on demand
+    | benchIfHasThenGetViaCachedAbstractFactory | 2.978µs           | 2.178µs          | <- real performance benefit
+    +-------------------------------------------+-------------------+------------------+
 
-
-    $ vendor\bin\phpbench report --file=..\zend.FetchNewServiceManager.xml --file=..\mxc.FetchNewServiceManager.xml --report=compare
-    benchmark: FetchNewServiceManagerBench
-    +----------------------------------+-----------------+----------------+
-    | subject                          | suite:zend:mean | suite:mxc:mean |
-    +----------------------------------+-----------------+----------------+
-    | benchFetchServiceManagerCreation | 878.050µs       | 287.376µs      |
-    +----------------------------------+-----------------+----------------+
-
-    $ vendor\bin\phpbench report --file=..\zend.all.xml --file=..\mxc.all.xml --report=compare
     benchmark: FetchCachedServicesBench
-    +----------------------------------+-----------------+----------------+
-    | subject                          | suite:zend:mean | suite:mxc:mean |
-    +----------------------------------+-----------------+----------------+
-    | benchFetchFactory1               | 0.452µs         | 0.435µs        |
-    | benchFetchInvokable1             | 0.473µs         | 0.454µs        |
-    | benchFetchService1               | 0.457µs         | 0.437µs        |
-    | benchFetchAlias1                 | 0.458µs         | 0.440µs        |
-    | benchFetchRecursiveAlias1        | 0.474µs         | 0.451µs        |
-    | benchFetchRecursiveAlias2        | 0.468µs         | 0.450µs        |
-    | benchFetchAbstractFactoryService | 2.450µs         | 2.471µs        |
-    +----------------------------------+-----------------+----------------+
+    +----------------------------------+-------------------+------------------+
+    | subject                          | suite:master:mean | suite:0.2.0:mean |
+    +----------------------------------+-------------------+------------------+
+    | benchFetchFactory1               | 0.452µs           | 0.449µs          |
+    | benchFetchInvokable1             | 0.473µs           | 0.459µs          |
+    | benchFetchService1               | 0.457µs           | 0.450µs          |
+    | benchFetchAlias1                 | 0.458µs           | 0.452µs          |
+    | benchFetchRecursiveAlias1        | 0.474µs           | 0.463µs          |
+    | benchFetchRecursiveAlias2        | 0.468µs           | 0.466µs          | <- table ok, as espected so far
+    | benchFetchAbstractFactoryService | 2.450µs           | 4.782µs          | <- price of creating abstract factories on demand
+    +----------------------------------+-------------------+------------------+
 
     benchmark: FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench
-    +-------------------------------------+-----------------+----------------+
-    | subject                             | suite:zend:mean | suite:mxc:mean |
-    +-------------------------------------+-----------------+----------------+
-    | benchFetchServiceWithNoDependencies | 5.042µs         | 4.482µs        |
-    | benchBuildServiceWithNoDependencies | 4.613µs         | 4.239µs        |
-    | benchFetchServiceDependingOnConfig  | 5.744µs         | 5.061µs        |
-    | benchBuildServiceDependingOnConfig  | 5.306µs         | 4.813µs        |
-    | benchFetchServiceWithDependency     | 5.681µs         | 5.046µs        |
-    | benchBuildServiceWithDependency     | 5.210µs         | 4.798µs        |
-    +-------------------------------------+-----------------+----------------+
+    +-------------------------------------+-------------------+------------------+
+    | subject                             | suite:master:mean | suite:0.2.0:mean |
+    +-------------------------------------+-------------------+------------------+
+    | benchFetchServiceWithNoDependencies | 5.042µs           | 4.582µs          |
+    | benchBuildServiceWithNoDependencies | 4.613µs           | 4.293µs          |
+    | benchFetchServiceDependingOnConfig  | 5.744µs           | 5.186µs          |
+    | benchBuildServiceDependingOnConfig  | 5.306µs           | 4.936µs          |
+    | benchFetchServiceWithDependency     | 5.681µs           | 5.140µs          |
+    | benchBuildServiceWithDependency     | 5.210µs           | 4.833µs          | <-table ok, as espected
+    +-------------------------------------+-------------------+------------------+
 
     benchmark: FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench
-    +-------------------------------------+-----------------+----------------+
-    | subject                             | suite:zend:mean | suite:mxc:mean |
-    +-------------------------------------+-----------------+----------------+
-    | benchFetchServiceWithNoDependencies | 3.963µs         | 3.490µs        |
-    | benchBuildServiceWithNoDependencies | 3.537µs         | 3.297µs        |
-    | benchFetchServiceDependingOnConfig  | 7.089µs         | 6.745µs        |
-    | benchBuildServiceDependingOnConfig  | 6.650µs         | 6.610µs        |
-    | benchFetchServiceWithDependency     | 8.432µs         | 8.160µs        |
-    | benchBuildServiceWithDependency     | 7.960µs         | 7.895µs        |
-    +-------------------------------------+-----------------+----------------+
+    +-------------------------------------+-------------------+------------------+
+    | subject                             | suite:master:mean | suite:0.2.0:mean |
+    +-------------------------------------+-------------------+------------------+
+    | benchFetchServiceWithNoDependencies | 3.963µs           | 3.566µs          |
+    | benchBuildServiceWithNoDependencies | 3.537µs           | 3.380µs          |
+    | benchFetchServiceDependingOnConfig  | 7.089µs           | 6.745µs          |
+    | benchBuildServiceDependingOnConfig  | 6.650µs           | 6.544µs          |
+    | benchFetchServiceWithDependency     | 8.432µs           | 8.049µs          |
+    | benchBuildServiceWithDependency     | 7.960µs           | 8.120µs          |  <- interesting! should be less
+    +-------------------------------------+-------------------+------------------+
 
     benchmark: FetchNewServiceViaConfigAbstractFactoryBench
-    +-------------------------------------+-----------------+----------------+
-    | subject                             | suite:zend:mean | suite:mxc:mean |
-    +-------------------------------------+-----------------+----------------+
-    | benchFetchServiceWithNoDependencies | 5.489µs         | 5.112µs        |
-    | benchBuildServiceWithNoDependencies | 4.922µs         | 4.743µs        |
-    | benchFetchServiceDependingOnConfig  | 6.143µs         | 5.744µs        |
-    | benchBuildServiceDependingOnConfig  | 5.601µs         | 5.412µs        |
-    | benchFetchServiceWithDependency     | 6.122µs         | 5.742µs        |
-    | benchBuildServiceWithDependency     | 5.564µs         | 5.363µs        |
-    +-------------------------------------+-----------------+----------------+
+    +-------------------------------------+-------------------+------------------+
+    | subject                             | suite:master:mean | suite:0.2.0:mean |
+    +-------------------------------------+-------------------+------------------+
+    | benchFetchServiceWithNoDependencies | 5.489µs           | 7.669µs          |
+    | benchBuildServiceWithNoDependencies | 4.922µs           | 7.472µs          |
+    | benchFetchServiceDependingOnConfig  | 6.143µs           | 8.488µs          |
+    | benchBuildServiceDependingOnConfig  | 5.601µs           | 8.037µs          |
+    | benchFetchServiceWithDependency     | 6.122µs           | 5.811µs          |
+    | benchBuildServiceWithDependency     | 5.564µs           | 5.411µs          | <-table ok, as espected
+    +-------------------------------------+-------------------+------------------+
 
     benchmark: FetchNewServiceViaReflectionAbstractFactoryBench
-    +-------------------------------------+-----------------+----------------+
-    | subject                             | suite:zend:mean | suite:mxc:mean |
-    +-------------------------------------+-----------------+----------------+
-    | benchFetchServiceWithNoDependencies | 3.434µs         | 3.273µs        |
-    | benchBuildServiceWithNoDependencies | 2.919µs         | 2.991µs        |
-    | benchFetchServiceDependingOnConfig  | 6.766µs         | 6.680µs        |
-    | benchBuildServiceDependingOnConfig  | 6.221µs         | 6.402µs        |
-    | benchFetchServiceWithDependency     | 8.095µs         | 7.994µs        |
-    | benchBuildServiceWithDependency     | 7.555µs         | 7.694µs        |
-    +-------------------------------------+-----------------+----------------+
+    +-------------------------------------+-------------------+------------------+
+    | subject                             | suite:master:mean | suite:0.2.0:mean |
+    +-------------------------------------+-------------------+------------------+
+    | benchFetchServiceWithNoDependencies | 3.434µs           | 5.774µs          | <- create abstract factories on demand
+    | benchBuildServiceWithNoDependencies | 2.919µs           | 5.560µs          | <- create abstract factories on demand
+    | benchFetchServiceDependingOnConfig  | 6.766µs           | 9.458µs          | <- create abstract factories on demand
+    | benchBuildServiceDependingOnConfig  | 6.221µs           | 9.215µs          | <- create abstract factories on demand
+    | benchFetchServiceWithDependency     | 8.095µs           | 7.995µs          | <- very interesting! Should not be less.
+    | benchBuildServiceWithDependency     | 7.555µs           | 8.370µs          | <- price of creating abstract factories on demand
+    +-------------------------------------+-------------------+------------------+
 
     benchmark: FetchNewServicesBench
-    +----------------------------------+-----------------+----------------+
-    | subject                          | suite:zend:mean | suite:mxc:mean |
-    +----------------------------------+-----------------+----------------+
-    | benchFetchFactory1               | 2.820µs         | 2.667µs        |
-    | benchBuildFactory1               | 2.395µs         | 2.200µs        |
-    | benchFetchInvokable1             | 3.315µs         | 2.477µs        |
-    | benchBuildInvokable1             | 2.620µs         | 2.060µs        |
-    | benchFetchService1               | 0.455µs         | 0.444µs        |
-    | benchFetchFactoryAlias1          | 2.454µs         | 2.223µs        |
-    | benchBuildFactoryAlias1          | 2.461µs         | 2.249µs        |
-    | benchFetchRecursiveFactoryAlias1 | 2.475µs         | 2.259µs        |
-    | benchBuildRecursiveFactoryAlias1 | 2.490µs         | 2.252µs        |
-    | benchFetchRecursiveFactoryAlias2 | 2.497µs         | 2.255µs        |
-    | benchBuildRecursiveFactoryAlias2 | 2.473µs         | 2.247µs        |
-    | benchFetchAbstractFactoryFoo     | 2.407µs         | 2.411µs        |
-    | benchBuildAbstractFactoryFoo     | 1.947µs         | 1.985µs        |
-    +----------------------------------+-----------------+----------------+
+    +----------------------------------+-------------------+------------------+
+    | subject                          | suite:master:mean | suite:0.2.0:mean |
+    +----------------------------------+-------------------+------------------+
+    | benchFetchFactory1               | 2.820µs           | 2.751µs          |
+    | benchBuildFactory1               | 2.395µs           | 2.325µs          |
+    | benchFetchInvokable1             | 3.315µs           | 2.205µs          |
+    | benchBuildInvokable1             | 2.620µs           | 1.726µs          |
+    | benchFetchService1               | 0.455µs           | 0.460µs          |
+    | benchFetchFactoryAlias1          | 2.454µs           | 2.243µs          |
+    | benchBuildFactoryAlias1          | 2.461µs           | 2.245µs          |
+    | benchFetchRecursiveFactoryAlias1 | 2.475µs           | 2.253µs          |
+    | benchBuildRecursiveFactoryAlias1 | 2.490µs           | 2.249µs          |
+    | benchFetchRecursiveFactoryAlias2 | 2.497µs           | 2.239µs          |
+    | benchBuildRecursiveFactoryAlias2 | 2.473µs           | 2.282µs          |
+    | benchFetchAbstractFactoryFoo     | 2.407µs           | 4.702µs          | <- price of creating abstract factories on demand
+    | benchBuildAbstractFactoryFoo     | 1.947µs           | 4.268µs          | <- price of creating abstract factories on demand
+    +----------------------------------+-------------------+------------------+
 
     benchmark: HasBench
-    +-------------------------+-----------------+----------------+
-    | subject                 | suite:zend:mean | suite:mxc:mean |
-    +-------------------------+-----------------+----------------+
-    | benchHasFactory1        | 0.526µs         | 0.535µs        |
-    | benchHasInvokable1      | 0.603µs         | 0.578µs        |
-    | benchHasService1        | 0.482µs         | 0.518µs        |
-    | benchHasAlias1          | 0.584µs         | 0.556µs        |
-    | benchHasRecursiveAlias1 | 0.605µs         | 0.569µs        |
-    | benchHasRecursiveAlias2 | 0.603µs         | 0.565µs        |
-    | benchHasAbstractFactory | 0.839µs         | 0.870µs        |
-    | benchHasNot             | 0.851µs         | 0.877µs        |
-    +-------------------------+-----------------+----------------+
-
-    benchmark: SetNewServicesBench
-    +------------------------------------+-----------------+----------------+
-    | subject                            | suite:zend:mean | suite:mxc:mean |
-    +------------------------------------+-----------------+----------------+
-    | benchSetService                    | 2.027µs         | 0.654µs        |
-    | benchSetFactory                    | 4.350µs         | 1.229µs        |
-    | benchSetAlias                      | 11.946µs        | 1.917µs        |
-    | benchOverrideAlias                 | 36.493µs        | 1.929µs        |
-    | benchSetInvokableClass             | 5.359µs         | 0.612µs        |
-    | benchAddDelegator                  | 2.090µs         | 0.728µs        |
-    | benchAddInitializerByClassName     | 2.473µs         | 1.490µs        |
-    | benchAddInitializerByInstance      | 1.764µs         | 0.910µs        |
-    | benchAddAbstractFactoryByClassName | 3.488µs         | 2.436µs        |
-    | benchAddAbstractFactoryByInstance  | 3.118µs         | 2.043µs        |
-    +------------------------------------+-----------------+----------------+
+    +-------------------------+-------------------+------------------+
+    | subject                 | suite:master:mean | suite:0.2.0:mean |
+    +-------------------------+-------------------+------------------+
+    | benchHasFactory1        | 0.526µs           | 0.593µs          |
+    | benchHasInvokable1      | 0.603µs           | 0.619µs          |
+    | benchHasService1        | 0.482µs           | 0.550µs          |
+    | benchHasAlias1          | 0.584µs           | 0.592µs          |
+    | benchHasRecursiveAlias1 | 0.605µs           | 0.606µs          |
+    | benchHasRecursiveAlias2 | 0.603µs           | 0.606µs          |
+    | benchHasAbstractFactory | 0.839µs           | 3.034µs          |
+    | benchHasNot             | 0.851µs           | 2.837µs          | <- price of creating abstract factories on demand
+    +-------------------------+-------------------+------------------+
 
 ## What's next?
 

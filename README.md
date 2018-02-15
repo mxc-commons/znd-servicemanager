@@ -131,7 +131,11 @@ which can cause that invokable definitions can inadvertently overwrite delegator
 
 ## Benchmark Comparisons
 
-0.2.0 readyness: Updated benchmarks for new releas 0.2.0
+0.2.0 readyness: Updated benchmarks for new releas 0.2.0. Some benchmarks show immense performance decreases. zend-servicemanager instantiates all initializers
+and abstract factories at configuration time. We dropped that behaviour (only things used need instantiation). That is the rationale, why all benchs associated with abstract factories and initializers
+seem to indicate that master could be possibly faster. It isn't. Time spent on creating initializers and abstract factories are not measured by any benchmark yet. This time gets
+unrevealed here. We will take care of that.
+
 
     $ vendor\bin\phpbench report --file=..\master.all.xml --file=..\all.020.xml --report="compare"
     benchmark: AbstractFactoryCacheBench
@@ -185,7 +189,7 @@ which can cause that invokable definitions can inadvertently overwrite delegator
     +-------------------------------------+-------------------+------------------+
     | subject                             | suite:master:mean | suite:0.2.0:mean |
     +-------------------------------------+-------------------+------------------+
-    | benchFetchServiceWithNoDependencies | 5.489µs           | 7.669µs          |
+    | benchFetchsServiceWithNoDependencies | 5.489µs           | 7.669µs          |
     | benchBuildServiceWithNoDependencies | 4.922µs           | 7.472µs          |
     | benchFetchServiceDependingOnConfig  | 6.143µs           | 8.488µs          |
     | benchBuildServiceDependingOnConfig  | 5.601µs           | 8.037µs          |
@@ -197,10 +201,10 @@ which can cause that invokable definitions can inadvertently overwrite delegator
     +-------------------------------------+-------------------+------------------+
     | subject                             | suite:master:mean | suite:0.2.0:mean |
     +-------------------------------------+-------------------+------------------+
-    | benchFetchServiceWithNoDependencies | 3.434µs           | 5.774µs          | <- create abstract factories on demand
-    | benchBuildServiceWithNoDependencies | 2.919µs           | 5.560µs          | <- create abstract factories on demand
-    | benchFetchServiceDependingOnConfig  | 6.766µs           | 9.458µs          | <- create abstract factories on demand
-    | benchBuildServiceDependingOnConfig  | 6.221µs           | 9.215µs          | <- create abstract factories on demand
+    | benchFetchServiceWithNoDependencies | 3.434µs           | 5.774µs          | <- price of creating abstract factories on demand
+    | benchBuildServiceWithNoDependencies | 2.919µs           | 5.560µs          | <- price of creating abstract factories on demand
+    | benchFetchServiceDependingOnConfig  | 6.766µs           | 9.458µs          | <- price of creating abstract factories on demand
+    | benchBuildServiceDependingOnConfig  | 6.221µs           | 9.215µs          | <- price of creating abstract factories on demand
     | benchFetchServiceWithDependency     | 8.095µs           | 7.995µs          | <- very interesting! Should not be less.
     | benchBuildServiceWithDependency     | 7.555µs           | 8.370µs          | <- price of creating abstract factories on demand
     +-------------------------------------+-------------------+------------------+

@@ -509,7 +509,7 @@ class ServiceManager implements ServiceLocatorInterface
     private function checkServiceFromAbstractFactory($name)
     {
         foreach ($this->cachedAbstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($name)) {
+            if ($abstractFactory->canCreate($this->creationContext, $name)) {
                 return true;
             }
         }
@@ -540,7 +540,7 @@ class ServiceManager implements ServiceLocatorInterface
     {
         // check already instantiated abstract factories first
         foreach ($this->cachedAbstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($name)) {
+            if ($abstractFactory->canCreate($this->creationContext, $name)) {
                 return $abstractFactory($this->creationContext, $name, $options);
             }
         }

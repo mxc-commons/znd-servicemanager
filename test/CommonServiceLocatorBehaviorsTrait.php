@@ -560,13 +560,17 @@ trait CommonServiceLocatorBehaviorsTrait
         $initializer,
         $contains = 'invalid initializer'
     ) {
-        $this->expectException(InvalidArgumentException::class);
-        self::expectExceptionMessage($contains);
-        $this->createContainer([
+        $sm = $this->createContainer([
+            'factories' => [
+                'factory' => SampleFactory::class,
+            ],
             'initializers' => [
                 $initializer,
             ],
         ]);
+        $this->expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($contains);
+        $sm->get('factory');
     }
 
     public function testGetRaisesExceptionWhenNoFactoryIsResolved()

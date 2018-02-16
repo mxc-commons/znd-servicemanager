@@ -1,6 +1,6 @@
 {
     "name": "mxc-commons/mxc-servicemanager",
-    "description": "Permanent fork of Zend ServiceManager 3",
+    "description": "Permanent fork of Zend ServiceManager 3 refactored for performance",
     "license": "BSD-3-Clause",
     "keywords": [
         "di",

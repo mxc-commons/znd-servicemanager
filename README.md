@@ -11,7 +11,7 @@ The badges above show the status of the associated repo mxc-services, where all 
 
 ## Version
 
-Version 0.1.0 created by Frank Hein, maxence operations GmbH, Germany
+Version 0.2.0 created on 2018-02-16 by Frank Hein, maxence operations GmbH, Germany
 
 ## Introduction
 
@@ -131,9 +131,9 @@ which can cause that invokable definitions can inadvertently overwrite delegator
 
 ## Benchmark Comparisons
 
-0.2.0 readyness: Updated benchmarks for new releas 0.2.0. Some benchmarks dealing with abstract factories show immense performance decreases now. Rationale
-behind that is, that we dropped the behaviour to instantiate all abstract factories on startup. Abstract factories and initializers are instantiated when
-needed now. The overhead of instantiating abstract factories and initializers now gets measured. We marked the benchmarks involved with a (*) below.
+0.2.0 Some benchmarks dealing with abstract factories show immense performance decreases now. Rationale behind that is, that we dropped the behaviour 
+to instantiate all abstract factories on startup. Abstract factories and initializers are instantiated when needed now. The overhead of instantiating 
+abstract factories and initializers now gets measured. We marked the benchmarks involved with a (*) below.
 
 
         $ vendor\bin\phpbench report --file=..\master.all.xml --file=..\all.020.xml --report="compare"
@@ -204,7 +204,7 @@ needed now. The overhead of instantiating abstract factories and initializers no
     (*) | benchBuildServiceWithNoDependencies | 2.919µs           | 5.560µs          |
     (*) | benchFetchServiceDependingOnConfig  | 6.766µs           | 9.458µs          |
     (*) | benchBuildServiceDependingOnConfig  | 6.221µs           | 9.215µs          |
-    (*) | benchFetchServiceWithDependency     | 8.095µs           | 7.995µs          | <- very interesting! Should not be less.
+    (*) | benchFetchServiceWithDependency     | 8.095µs           | 7.995µs          | <- interesting! Should not be less.
     (*) | benchBuildServiceWithDependency     | 7.555µs           | 8.370µs          |
         +-------------------------------------+-------------------+------------------+
 
@@ -238,7 +238,7 @@ needed now. The overhead of instantiating abstract factories and initializers no
         | benchHasRecursiveAlias1 | 0.605µs           | 0.606µs          |
         | benchHasRecursiveAlias2 | 0.603µs           | 0.606µs          |
         | benchHasAbstractFactory | 0.839µs           | 3.034µs          |
-    (*) | benchHasNot             | 0.851µs           | 2.837µs          | <- price of creating abstract factories on demand
+    (*) | benchHasNot             | 0.851µs           | 2.837µs          |
         +-------------------------+-------------------+------------------+
 
 ## What's next?
@@ -265,5 +265,5 @@ In parallel:
 4. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
 5. Provide benchmarks which respect internal staging (i.e. configuration array only, aliases resolved, factories called, ...).
 
-Proide comparison benchmarks on every single step.
+Provide comparison benchmarks on every single step.
 

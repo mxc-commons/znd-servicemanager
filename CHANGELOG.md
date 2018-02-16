@@ -2,7 +2,33 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 4.0.0 - TBD
+## Version 0.2.0
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Abstract factories do not get pre-instantiated any longer. As other factories they
+  get instantiated and cached on first use. This has impact on all benchmarks which deal
+  with abstract factories, because the price of abstract factory instantiation gets measured
+  now.
+
+- Initializers do not get preinstanciated any longer. They get instanciated on first use.
+  This has performance impact on the first call to get, because initializer instanciation
+  get's mesured now.
+
+- The callback function iteratively created for delegators gets cached now.
+
+- Refactored the service resolution process for performance. Achievement around 10%.
+
+
+### Deprecated
+
+- Nothing.
+
+## Version 0.1.0
 
 ### Added
 
@@ -91,7 +117,7 @@ All notable changes to this project will be documented in this file, in reverse 
   container-interop at a minimum version of 1.2.0, and adding a requirement on
   psr/container 1.0. `Zend\ServiceManager\ServiceLocatorInterface` now
   explicitly extends the `ContainerInterface` from both projects.
-  
+
   Factory interfaces still typehint against the container-interop variant, as
   changing the typehint would break backwards compatibility. Users can
   duck-type most of these interfaces, however, by creating callables or
@@ -369,7 +395,7 @@ Documentation is now available at http://zend-servicemanager.rtfd.org
   (previously, it was the third).
 
   Example:
-  
+
   ```php
   $sm = new \Zend\ServiceManager\ServiceManager([
       'factories'  => [
@@ -378,7 +404,7 @@ Documentation is now available at http://zend-servicemanager.rtfd.org
           'MyClassC'      => 'MyFactory' // This is equivalent as using ::class
       ],
   ]);
-  
+
   $sm->get(MyClassA::class); // MyFactory will receive MyClassA::class as second parameter
   ```
 
@@ -397,7 +423,7 @@ Documentation is now available at http://zend-servicemanager.rtfd.org
         if ($instance instanceof \Zend\Validator\ValidatorInterface) {
             return;
         }
-    
+
         throw new InvalidServiceException(sprintf(
             'Plugin manager "%s" expected an instance of type "%s", but "%s" was received',
              __CLASS__,
@@ -407,19 +433,19 @@ Documentation is now available at http://zend-servicemanager.rtfd.org
     }
   }
   ```
-  
+
   In version 3, this becomes:
-  
+
   ```php
   use Zend\ServiceManager\AbstractPluginManager;
   use Zend\Validator\ValidatorInterface;
-  
+
   class MyPluginManager extends AbstractPluginManager
   {
       protected $instanceOf = ValidatorInterface::class;
   }
   ```
-  
+
   Of course, you can still override the `validate` method if your logic is more
   complex.
 
@@ -463,17 +489,17 @@ changes, outlined in this section.
   service manager; you can pass the configuration array directly instead.
 
   In version 2.x:
-  
+
   ```php
   $config = new \Zend\ServiceManager\Config([
       'factories'  => [...]
   ]);
-  
+
   $sm = new \Zend\ServiceManager\ServiceManager($config);
   ```
-  
+
   In ZF 3.x:
-  
+
   ```php
   $sm = new \Zend\ServiceManager\ServiceManager([
       'factories'  => [...]
@@ -502,7 +528,7 @@ changes, outlined in this section.
   argument if present.
 
   For instance, here is a simple version 2.x factory:
-  
+
   ```php
   class MyFactory implements FactoryInterface
   {
@@ -512,9 +538,9 @@ changes, outlined in this section.
       }
   }
   ```
-  
+
   The equivalent version 3 factory:
-  
+
   ```php
   class MyFactory implements FactoryInterface
   {
@@ -544,23 +570,23 @@ changes, outlined in this section.
   through the interface.
 
   In version 2.x, if a factory was set to a service name defined in a plugin manager:
-  
+
   ```php
   class MyFactory implements FactoryInterface
   {
       function createService(ServiceLocatorInterface $sl)
       {
           // $sl is actually a plugin manager
-        
+
           $parentLocator = $sl->getServiceLocator();
-        
+
           // ...
       }
   }
   ```
-  
+
   In version 3:
-  
+
   ```php
   class MyFactory implements FactoryInterface
   {

@@ -1,6 +1,6 @@
 {
-    "name": "mxc-commons/mxc-services",
-    "description": "Factory-Driven Dependency Injection Container Compatible To Zend ServiceManager 3",
+    "name": "mxc-commons/mxc-servicemanager",
+    "description": "Permanent fork of Zend ServiceManager 3",
     "license": "BSD-3-Clause",
     "keywords": [
         "di",

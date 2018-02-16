@@ -114,132 +114,12 @@ If you want to run tests and benchmarks, you will have to clone [mxc-services](h
 
 ## State Of Progress
 
-Things done so far:
-
-### Enhancements
-1. Refactored the alias resolution algorithm for much better performance.
-2. Refactored invokable handling for much better performance, btw fixing a severe bug (see bugfixes below). We recommend to define invokables in the invokables section for better performance than via InvokableFactory
-3. Inlined most function calls of `configure()` to reduce function call overhead induced performance drops. As a result of 1. - 3. mxc-servicemanager's `configure()` needs only 1/3 of the time zend-servicemanager's `configure()` needs.
-4. Refactored the setter APIs not to call `configure()` any longer and just do the particular changes requested by the caller. Performance was increased up to 18 times by these changes.
-5. Added several unit tests for scenarios not tested before. The pull request to zend-servicemanager was accepted.
-6. Added several benchmarks for features which were not measured before. According PRs were partially accepted by zend-servicemanager.
-
-### Bug Fixes
-1. Undeprecated invokables, because the zend-servicemanager implementation (replacing invokable definitions with alias/factory pair) has a bug,
-which can cause that invokable definitions can inadvertently overwrite delegator definitions. The bugfix we provided via pull request to zend-servicemanager was rejected because of communication issues.
-2. If derived classes provided inlined configuration for abstract factories or initializers, these configurations were ignored by zend-servicemanager. The assiciated PR was rejected because of communication issues.
+Please refer to the [change log](CHANGELOG.md) for a list of changes and enhancements.
 
 ## Benchmark Comparisons
 
-0.2.0 Some benchmarks dealing with abstract factories show immense performance decreases now. Rationale behind that is, that we dropped the behaviour 
-to instantiate all abstract factories on startup. Abstract factories and initializers are instantiated when needed now. The overhead of instantiating 
-abstract factories and initializers now gets measured. We marked the benchmarks involved with a (*) below.
-
-
-        $ vendor\bin\phpbench report --file=..\master.all.xml --file=..\all.020.xml --report="compare"
-        benchmark: AbstractFactoryCacheBench
-        +-------------------------------------------+-------------------+------------------+
-        | subject                                   | suite:master:mean | suite:0.2.0:mean |
-        +-------------------------------------------+-------------------+------------------+
-    (*) | benchGetViaAbstractFactory                | 2.361µs           | 4.470µs          |
-        | benchGetViaCachedAbstractFactory          | 2.405µs           | 1.920µs          |
-    (*) | benchIfHasThenGetViaAbstractFactory       | 2.982µs           | 4.861µs          |
-        | benchIfHasThenGetViaCachedAbstractFactory | 2.978µs           | 2.178µs          |
-        +-------------------------------------------+-------------------+------------------+
-
-        benchmark: FetchCachedServicesBench
-        +----------------------------------+-------------------+------------------+
-        | subject                          | suite:master:mean | suite:0.2.0:mean |
-        +----------------------------------+-------------------+------------------+
-        | benchFetchFactory1               | 0.452µs           | 0.449µs          |
-        | benchFetchInvokable1             | 0.473µs           | 0.459µs          |
-        | benchFetchService1               | 0.457µs           | 0.450µs          |
-        | benchFetchAlias1                 | 0.458µs           | 0.452µs          |
-        | benchFetchRecursiveAlias1        | 0.474µs           | 0.463µs          |
-        | benchFetchRecursiveAlias2        | 0.468µs           | 0.466µs          |
-    (*) | benchFetchAbstractFactoryService | 2.450µs           | 4.782µs          |
-        +----------------------------------+-------------------+------------------+
-
-        benchmark: FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench
-        +-------------------------------------+-------------------+------------------+
-        | subject                             | suite:master:mean | suite:0.2.0:mean |
-        +-------------------------------------+-------------------+------------------+
-        | benchFetchServiceWithNoDependencies | 5.042µs           | 4.582µs          |
-        | benchBuildServiceWithNoDependencies | 4.613µs           | 4.293µs          |
-        | benchFetchServiceDependingOnConfig  | 5.744µs           | 5.186µs          |
-        | benchBuildServiceDependingOnConfig  | 5.306µs           | 4.936µs          |
-        | benchFetchServiceWithDependency     | 5.681µs           | 5.140µs          |
-        | benchBuildServiceWithDependency     | 5.210µs           | 4.833µs          |
-        +-------------------------------------+-------------------+------------------+
-
-        benchmark: FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench
-        +-------------------------------------+-------------------+------------------+
-        | subject                             | suite:master:mean | suite:0.2.0:mean |
-        +-------------------------------------+-------------------+------------------+
-        | benchFetchServiceWithNoDependencies | 3.963µs           | 3.566µs          |
-        | benchBuildServiceWithNoDependencies | 3.537µs           | 3.380µs          |
-        | benchFetchServiceDependingOnConfig  | 7.089µs           | 6.745µs          |
-        | benchBuildServiceDependingOnConfig  | 6.650µs           | 6.544µs          |
-        | benchFetchServiceWithDependency     | 8.432µs           | 8.049µs          |
-        | benchBuildServiceWithDependency     | 7.960µs           | 8.120µs          |  <- interesting! should be less
-        +-------------------------------------+-------------------+------------------+
-
-        benchmark: FetchNewServiceViaConfigAbstractFactoryBench
-        +--------------------------------------+-------------------+------------------+
-        | subject                              | suite:master:mean | suite:0.2.0:mean |
-        +--------------------------------------+-------------------+------------------+
-        | benchFetchsServiceWithNoDependencies | 5.489µs           | 7.669µs          |
-        | benchBuildServiceWithNoDependencies  | 4.922µs           | 7.472µs          |
-        | benchFetchServiceDependingOnConfig   | 6.143µs           | 8.488µs          |
-        | benchBuildServiceDependingOnConfig   | 5.601µs           | 8.037µs          |
-        | benchFetchServiceWithDependency      | 6.122µs           | 5.811µs          |
-        | benchBuildServiceWithDependency      | 5.564µs           | 5.411µs          |
-        +--------------------------------------+-------------------+------------------+
-
-        benchmark: FetchNewServiceViaReflectionAbstractFactoryBench
-        +-------------------------------------+-------------------+------------------+
-        | subject                             | suite:master:mean | suite:0.2.0:mean |
-        +-------------------------------------+-------------------+------------------+
-    (*) | benchFetchServiceWithNoDependencies | 3.434µs           | 5.774µs          |
-    (*) | benchBuildServiceWithNoDependencies | 2.919µs           | 5.560µs          |
-    (*) | benchFetchServiceDependingOnConfig  | 6.766µs           | 9.458µs          |
-    (*) | benchBuildServiceDependingOnConfig  | 6.221µs           | 9.215µs          |
-    (*) | benchFetchServiceWithDependency     | 8.095µs           | 7.995µs          | <- interesting! Should not be less.
-    (*) | benchBuildServiceWithDependency     | 7.555µs           | 8.370µs          |
-        +-------------------------------------+-------------------+------------------+
-
-        benchmark: FetchNewServicesBench
-        +----------------------------------+-------------------+------------------+
-        | subject                          | suite:master:mean | suite:0.2.0:mean |
-        +----------------------------------+-------------------+------------------+
-        | benchFetchFactory1               | 2.820µs           | 2.751µs          |
-        | benchBuildFactory1               | 2.395µs           | 2.325µs          |
-        | benchFetchInvokable1             | 3.315µs           | 2.205µs          |
-        | benchBuildInvokable1             | 2.620µs           | 1.726µs          |
-        | benchFetchService1               | 0.455µs           | 0.460µs          |
-        | benchFetchFactoryAlias1          | 2.454µs           | 2.243µs          |
-        | benchBuildFactoryAlias1          | 2.461µs           | 2.245µs          |
-        | benchFetchRecursiveFactoryAlias1 | 2.475µs           | 2.253µs          |
-        | benchBuildRecursiveFactoryAlias1 | 2.490µs           | 2.249µs          |
-        | benchFetchRecursiveFactoryAlias2 | 2.497µs           | 2.239µs          |
-        | benchBuildRecursiveFactoryAlias2 | 2.473µs           | 2.282µs          |
-    (*) | benchFetchAbstractFactoryFoo     | 2.407µs           | 4.702µs          |
-    (*) | benchBuildAbstractFactoryFoo     | 1.947µs           | 4.268µs          |
-        +----------------------------------+-------------------+------------------+
-
-        benchmark: HasBench
-        +-------------------------+-------------------+------------------+
-        | subject                 | suite:master:mean | suite:0.2.0:mean |
-        +-------------------------+-------------------+------------------+
-        | benchHasFactory1        | 0.526µs           | 0.593µs          |
-        | benchHasInvokable1      | 0.603µs           | 0.619µs          |
-        | benchHasService1        | 0.482µs           | 0.550µs          |
-        | benchHasAlias1          | 0.584µs           | 0.592µs          |
-        | benchHasRecursiveAlias1 | 0.605µs           | 0.606µs          |
-        | benchHasRecursiveAlias2 | 0.603µs           | 0.606µs          |
-        | benchHasAbstractFactory | 0.839µs           | 3.034µs          |
-    (*) | benchHasNot             | 0.851µs           | 2.837µs          |
-        +-------------------------+-------------------+------------------+
+Please refer to the current release documentation or to the [CHANGELOG.md](CHANGELOG.md), which contains a comprehensive benchmark comparison for
+each version.
 
 ## What's next?
 
@@ -250,20 +130,17 @@ Tests:
 
 Enhancements:
 
-1. Leverage abstract factory caching
-2. Introduce delegator-construction-cache
-3. Introduce service-resolution-logic caching
-4. Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
-5. Introduce ServiceManager pre-compiler
+1. Provide benchmark tests for all features currently left out.
+2. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
+3. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
+4. Provide benchmarks which respect internal staging (i.e. configuration array only, aliases resolved, factories called, ...).
+5. Deploy benchmark suite with mxc-servicemanager
+6. Deploy test suite with mxc-servicemanager
+7. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
+8. Investigating: Introduce ServiceManager pre-compiler
     (automatically and dynamically provide a service manager implementation which is optimized to support only the features actually used by the application)
 
-In parallel:
 
-1. Provide benchmark tests for all features currently left out.
-2. Provide unit tests for all newly introduced changes.
-3. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
-4. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
-5. Provide benchmarks which respect internal staging (i.e. configuration array only, aliases resolved, factories called, ...).
 
 Provide comparison benchmarks on every single step.
 

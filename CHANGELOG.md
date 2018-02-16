@@ -23,6 +23,11 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - Refactored the service resolution process for performance. Achievement around 10%.
 
+### Deprecated
+
+- Nothing.
+
+
 ### Benchmark Comparison zend-master vs. mxc-master
 
 Because of dropping pre-instantiation of abstract factories some benchmarks dropped in performance.
@@ -162,10 +167,6 @@ comparison.
         | benchAddAbstractFactoryByClassName | 3.524μs           | 0.738μs        |
         | benchAddAbstractFactoryByInstance  | 3.076μs           | 1.500μs        |
         +------------------------------------+-------------------+----------------+
-
-### Deprecated
-
-- Nothing.
 
 ## Version 0.1.0
 

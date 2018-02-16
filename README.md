@@ -130,14 +130,16 @@ Tests:
 
 Enhancements:
 
-1. Provide benchmark tests for all features currently left out.
-2. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
-3. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
-4. Provide benchmarks which respect internal staging (i.e. configuration array only, aliases resolved, factories called, ...).
-5. Deploy benchmark suite with mxc-servicemanager
-6. Deploy test suite with mxc-servicemanager
-7. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
-8. Investigating: Introduce ServiceManager pre-compiler
+1. Refactor ConfigAbstractFactory for performance.
+2. Refactor ReflectionAbstractFactory for performance.
+3. Provide benchmark tests for all features currently left out.
+4. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
+5. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
+6. Provide benchmarks which respect internal staging (i.e. configuration array only, aliases resolved, factories called, ...).
+7. Deploy benchmark suite with mxc-servicemanager
+8. Deploy test suite with mxc-servicemanager
+9. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
+10. Investigating: Introduce ServiceManager pre-compiler
     (automatically and dynamically provide a service manager implementation which is optimized to support only the features actually used by the application)
 
 

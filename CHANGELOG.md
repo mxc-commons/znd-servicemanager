@@ -229,8 +229,8 @@ comparison.
 ### Benchmark Comparsion zend-master vs. mxc-master
 Significant performance improvements currently are the creation of a new ServiceManager with several thousand items via call to configure() (3x faster) and service creation via the setter APIs (setService, setAlias, ...) which is between minimum 1.3x and maximum 18.0x as fast as zend-servicemanager. Most other sections profit a bit from the refactored handling of invokable and aliases.
 
-$ vendor\bin\phpbench report --file=..\zend.FetchNewServiceManager.xml --file=..\mxc.FetchNewServiceManager.xml --report=compare
-benchmark: FetchNewServiceManagerBench
+    $ vendor\bin\phpbench report --file=..\zend.FetchNewServiceManager.xml --file=..\mxc.FetchNewServiceManager.xml --report=compare
+    benchmark: FetchNewServiceManagerBench
     +----------------------------------+-----------------+----------------+
     | subject                          | suite:zend:mean | suite:mxc:mean |
     +----------------------------------+-----------------+----------------+

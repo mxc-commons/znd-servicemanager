@@ -10,6 +10,27 @@ namespace Zend\ServiceManager\Exception;
 class CyclicAliasException extends InvalidArgumentException
 {
     /**
+     * @param string   $alias conflicting alias key
+     * @param string[] $aliases map of referenced services, indexed by alias name (string)
+     * @return self
+     */
+    public static function fromCyclicAlias($alias, array $aliases)
+    {
+        $cycle = $alias;
+        $cursor = $alias;
+        while (isset($aliases[$cursor]) && $aliases[$cursor] !== $alias) {
+            $cursor = $aliases[$cursor];
+            $cycle .= ' -> '. $cursor;
+        }
+        $cycle .= ' -> ' . $alias . "\n";
+
+        return new self(sprintf(
+            "A cycle was detected within the aliases definitions:\n%s",
+            $cycle
+        ));
+    }
+
+    /**
      * @param string[] $aliases map of referenced services, indexed by alias name (string)
      *
      * @return self

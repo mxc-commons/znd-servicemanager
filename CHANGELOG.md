@@ -66,6 +66,7 @@ completely in sync. This was corrected in this version. The corrected benchmark 
 setAlias and setOverrideAlias are much slower in zend-master than suggested by the 0.1.0 benchmark
 comparison.
 
+
         $ vendor\bin\phpbench report --file=..\all.master.xml --file=..\all.020.xml --report="compare"
         benchmark: AbstractFactoryCacheBench
         +----------------------------------+-------------------+----------------+

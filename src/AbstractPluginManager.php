@@ -122,6 +122,17 @@ abstract class AbstractPluginManager extends ServiceManager implements PluginMan
     }
 
     /**
+     * Override setService for additional plugin validation.
+     *
+     * {@inheritDoc}
+     */
+    public function setService($name, $service)
+    {
+        $this->validate($service);
+        parent::setService($name, $service);
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @param string $name Service name of plugin to retrieve.

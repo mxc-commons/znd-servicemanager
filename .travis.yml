@@ -9,7 +9,7 @@ cache:
 env:
   global:
     - COMPOSER_ARGS="--no-interaction"
-    - COVERAGE_DEPS="php-coveralls/php-coveralls"
+    - COVERAGE_DEPS="satooshi/php-coveralls"
 
 matrix:
   include:
@@ -39,9 +39,10 @@ before_install:
   - if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
 
 install:
-  - travis_retry composer install $COMPOSER_ARGS
-  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update $COMPOSER_ARGS ; fi
+  - travis_retry composer install $COMPOSER_ARGS --ignore-platform-reqs
+  - if [[ $LEGACY_DEPS != '' ]]; then travis_retry composer update --with-dependencies $COMPOSER_ARGS $LEGACY_DEPS ; fi
   - if [[ $DEPS == 'lowest' ]]; then travis_retry composer update --prefer-lowest --prefer-stable $COMPOSER_ARGS ; fi
+  - if [[ $DEPS == 'latest' ]]; then travis_retry composer update $COMPOSER_ARGS ; fi
   - if [[ $TEST_COVERAGE == 'true' ]]; then travis_retry composer require --dev $COMPOSER_ARGS $COVERAGE_DEPS ; fi
   - stty cols 120 && composer show
 
@@ -51,7 +52,5 @@ script:
   - if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
 
 after_script:
-  - if [[ $TEST_COVERAGE == 'true' ]]; then vendor/bin/php-coveralls -v ; fi
-
-notifications:
-  email: false
+  - if [[ $TEST_COVERAGE == 'true' ]]; then composer upload-coverage ; fi
+  

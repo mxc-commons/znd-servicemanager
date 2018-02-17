@@ -25,7 +25,6 @@ class ContainerModificationsNotAllowedException extends DomainException implemen
             . ' with existing instances; the following service'
             . ' already exists in the container: %s',
             $service
-            ));
+        ));
     }
-
 }

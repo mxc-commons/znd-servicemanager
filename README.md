@@ -9,7 +9,8 @@ develop:
 
 ## Version
 
-Version 0.3.0 created on 2018-02-17 by Frank Hein, maxence operations GmbH, Germany
+Version 0.3.0 created on 2018-02-17 by Frank Hein, maxence operations GmbH, Germany.
+
 This version is based on Zend Service Manager 3.3.2.
 
 ## Introduction

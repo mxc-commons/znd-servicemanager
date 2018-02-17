@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+
+## Version 0.3.0
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Restructured Packagist offering mxc-servicemanager to provide full repo. This way the
+  full benchmark suite and phpunit suite gets available.
+
+- Former reduced offering mxc-servicemanager has been changed to mxc-servicemanager-s. Low
+footprint, MxcCommons namespace, dependency to mxc-servicemanager.
+
+- Documentation adjusted to reflect changes above.
+
+### Deprecated
+
+- mxc-services GitHub repo. It's now mxc-servicemanager.
+
+
+### Benchmark Comparison zend-master vs. mxc-master
+
+No impact. See 0.2.0 below.
+
 ## Version 0.2.0
 
 ### Added

@@ -87,12 +87,6 @@ To install mxc-servicemanager:
 Now you can use Zend\ServiceManager the way you are used to use it. zend-servicemanager is transparently replaced by mxc-servicemanager. mxc-servicemanager
 instances get created by `new Zend\ServiceManager\ServiceManager` as before.
 
-## Minimum footprint version
-
-If you want to use mxc-servicemanager without need to replace zend-servicemanager, you may use this repo, too. If you prefer not to replace dependencies to
-zend-servicemanager and want a minimum footprint installation living in the MxcCommons namespace, you might want to have a look at [mxc-servicemanager-s](https://github.com/mxc-commons/mxc-servicemanager-s). That repo only
-installs files different from zend-servicemanager and puts them into the MxcCommons namespace. mxc-servicemanager-s has a dependency to zend-servicemanager while this repo has not.
-
 ## License
 
 mxc-servicemanager is provided under the New BSD License. See `license.txt`.

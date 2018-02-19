@@ -58,6 +58,15 @@ class ServiceManager implements ServiceLocatorInterface
     protected $abstractFactories = [];
 
     /**
+     * Set to true, service manager will mimic zend-servicemanager's behaviour
+     * to pre-instantiate abstract factories on startup. This setting is merely
+     * used for comparison benchmarks.
+     *
+     * @var boolean
+     */
+    protected $cacheAbstractFactoriesOnStartup = false;
+
+    /**
      * A list of aliases
      *
      * Should map one alias to a service name, or another alias (aliases are recursively resolved)
@@ -336,6 +345,10 @@ class ServiceManager implements ServiceLocatorInterface
             $this->lazyServices = $config['lazy_services'] + $this->lazyServices;
         }
 
+        if (isset($config['cache_abstract_factories_on_startup'])) {
+            $this->cacheAbstractFactoriesOnStartup = $config['cache_abstract_factories_on_startup'];
+        }
+
         if (isset($config['shared_by_default'])) {
             $this->sharedByDefault = $config['shared_by_default'];
         }
@@ -350,6 +363,10 @@ class ServiceManager implements ServiceLocatorInterface
                     throw InvalidArgumentException::fromInvalidAbstractFactory($factory);
                 }
             }
+        }
+
+        if ($this->cacheAbstractFactoriesOnStartup) {
+            $this->has('__unknown___\___service___');
         }
 
         if (! empty($config['initializers'])) {

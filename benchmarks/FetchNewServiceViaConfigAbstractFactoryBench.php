@@ -45,9 +45,8 @@ class FetchNewServiceViaConfigAbstractFactoryBench
             'abstract_factories' => [
                 ConfigAbstractFactory::class,
             ],
+            'cache_abstract_factories_on_startup' => true,
         ]);
-        $this->smCached = clone $this->sm;
-        $this->smCached->has('unknown service');
     }
 
     public function benchFetchServiceWithNoDependencies()
@@ -88,48 +87,6 @@ class FetchNewServiceViaConfigAbstractFactoryBench
     public function benchBuildServiceWithDependency()
     {
         $sm = clone $this->sm;
-
-        $sm->build(BenchAsset\ServiceWithDependency::class);
-    }
-
-    public function benchFetchServiceWithNoDependenciesCached()
-    {
-        $sm = clone $this->smCached;
-
-        $sm->get(BenchAsset\Dependency::class);
-    }
-
-    public function benchBuildServiceWithNoDependenciesCached()
-    {
-        $sm = clone $this->smCached;
-
-        $sm->build(BenchAsset\Dependency::class);
-    }
-
-    public function benchFetchServiceDependingOnConfigCached()
-    {
-        $sm = clone $this->smCached;
-
-        $sm->get(BenchAsset\ServiceDependingOnConfig::class);
-    }
-
-    public function benchBuildServiceDependingOnConfigCached()
-    {
-        $sm = clone $this->smCached;
-
-        $sm->build(BenchAsset\ServiceDependingOnConfig::class);
-    }
-
-    public function benchFetchServiceWithDependencyCached()
-    {
-        $sm = clone $this->smCached;
-
-        $sm->get(BenchAsset\ServiceWithDependency::class);
-    }
-
-    public function benchBuildServiceWithDependencyCached()
-    {
-        $sm = clone $this->smCached;
 
         $sm->build(BenchAsset\ServiceWithDependency::class);
     }

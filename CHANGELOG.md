@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## Version 0.4.0 - 2018-02-19
+
+## Added
+
+- Added configuration option `cache_abstract_factories_on_startup`. With this option set to true, mxc-servicemanager
+  mimics zend-servicemanager's behaviour to pre-instantiate abstract factories on startup. This setting
+  was added merely to be able to produce valid benchmark comparisons of zend-servicemanager and
+  mxc-servicemanager. Recommended setting for production is false, which is the default.
+
+## Fixed
+
+- nothing
+
+## Changed
+
+- Caching of configuration in ConfigAbstractFactory. Configuration can be assumed to be unchanged between calls,
+  also this is not documented. If configuration can be changed between calls, abstract factories can not grant,
+  that they can produce services which they report to be able to produce via canCreate.
+
+- Added `cache_abstract_factories_on_startup` set to true to all benchmarks involving abstract factories in order
+  to get comparable results to zend-servicemanager. Only exception is AbstractFactoryCacheBench, which is meant
+  to measure the caching mechanismus in default mode.
+
+## Deprecated
+
+- nothing
+
+## Benchmark comparison
+
+
+
 ## Version 0.3.1 - 2018-02-19
 
 ## Added

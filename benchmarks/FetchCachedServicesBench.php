@@ -43,7 +43,8 @@ class FetchCachedServicesBench
             ],
             'abstract_factories' => [
                 BenchAsset\AbstractFactoryFoo::class
-            ]
+            ],
+            'cache_abstract_factories_on_startup' => true,
         ]);
 
         // forcing initialization of all the services

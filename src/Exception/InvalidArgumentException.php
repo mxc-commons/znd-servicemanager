@@ -11,6 +11,7 @@ use InvalidArgumentException as SplInvalidArgumentException;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Initializer\InitializerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**
  * @inheritDoc
@@ -56,6 +57,26 @@ class InvalidArgumentException extends SplInvalidArgumentException implements Ex
             . ' class name resolving to an implementation of "%s", but "%s" was received.',
             AbstractFactoryInterface::class,
             is_object($abstractFactory) ? get_class($abstractFactory) : gettype($abstractFactory)
+        ));
+    }
+
+    public static function fromInvalidDelegatorFactoryClass($name)
+    {
+        return new self(sprintf(
+            'An invalid delegator factory was registered; resolved to class or function "%s" '
+            . 'which does not exist; please provide a valid function name or class name resolving '
+            . 'to an implementation of %s',
+            $name,
+            DelegatorFactoryInterface::class
+        ));
+    }
+
+    public static function fromInvalidDelegatorFactoryInstance($name)
+    {
+        return new self(sprintf(
+            'A non-callable delegator, "%s", was provided; expected a callable or instance of "%s"',
+            is_object($name) ? get_class($name) : gettype($name),
+            DelegatorFactoryInterface::class
         ));
     }
 }

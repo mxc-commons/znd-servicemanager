@@ -33,6 +33,7 @@ use function spl_object_hash;
 use function trigger_error;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\Initializer\InitializerInterface;
+use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**
  * Service Manager.
@@ -534,9 +535,9 @@ class ServiceManager implements ServiceLocatorInterface
 
             if (is_string($delegatorFactory) && class_exists($delegatorFactory)) {
                 $delegatorFactory = ($delegatorFactory === Proxy\LazyServiceFactory::class)
-                ? $this->createLazyServiceDelegatorFactory()
-                : new $delegatorFactory();
-                if (is_callable($delegatorFactory)) {
+                    ? $this->createLazyServiceDelegatorFactory()
+                    : new $delegatorFactory();
+                if ($delegatorFactory instanceof DelegatorFactoryInterface) {
                     $this->delegators[$name][$index] = $delegatorFactory;
                     $creationCallback = function () use ($delegatorFactory, $name, $creationCallback, $options) {
                         return $delegatorFactory($this->creationContext, $name, $creationCallback, $options);
@@ -545,9 +546,9 @@ class ServiceManager implements ServiceLocatorInterface
                 }
             }
             if (is_string($delegatorFactory)) {
-                throw ServiceNotCreatedException::fromInvalidClass($delegatorFactory);
+                throw InvalidArgumentException::fromInvalidDelegatorFactoryClass($delegatorFactory);
             }
-            throw ServiceNotCreatedException::fromInvalidInstance($delegatorFactory);
+            throw InvalidArgumentException::fromInvalidDelegatorFactoryInstance($delegatorFactory);
         }
         // cache the callback for later requests
         $this->delegatorCallbackCache[$name] = $creationCallback;
@@ -913,7 +914,7 @@ class ServiceManager implements ServiceLocatorInterface
      * configuration present.
      *
      * @return Proxy\LazyServiceFactory
-     * @throws ServiceNotCreatedException when the lazy service class_map
+     * @throws InvalidArgumentException when the lazy service class_map
      *     configuration is missing
      */
     private function createLazyServiceDelegatorFactory()
@@ -925,7 +926,7 @@ class ServiceManager implements ServiceLocatorInterface
         }
 
         if (! isset($this->lazyServices['class_map'])) {
-            throw new ServiceNotCreatedException('Missing "class_map" config key in "lazy_services"');
+            throw new InvalidArgumentException('Missing "class_map" config key in "lazy_services"');
         }
 
         $factoryConfig = new ProxyConfiguration();

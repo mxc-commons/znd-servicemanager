@@ -608,7 +608,7 @@ trait CommonServiceLocatorBehaviorsTrait
             ],
         ]);
 
-        self::expectException(ServiceNotCreatedException::class);
+        self::expectException(InvalidArgumentException::class);
         self::expectExceptionMessage($contains);
         $serviceManager->get(stdClass::class);
     }
@@ -876,6 +876,22 @@ trait CommonServiceLocatorBehaviorsTrait
         ]);
         self::expectException(InvalidArgumentException::class);
         $sm->get('wrongFactory');
+    }
+
+    public function testThrowOnDelegatorsNotImplementingDelegatorFactoryInterface()
+    {
+        $sm = $this->createContainer([
+            'factories' => [
+                'delegator' => SampleFactory::class,
+            ],
+            'delegators' => [
+                'delegator' => [
+                    InvokableObject::class
+                ],
+            ],
+        ]);
+        self::expectException(InvalidArgumentException::class);
+        $sm->get('delegator');
     }
 
     public function testThrowOnInitializersNotImplementingInitializerInterface()

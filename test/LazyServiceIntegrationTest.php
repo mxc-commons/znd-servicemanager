@@ -14,7 +14,7 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 use stdClass;
-use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\InvalidArgumentException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\ServiceManager\Proxy\LazyServiceFactory;
@@ -177,7 +177,7 @@ class LazyServiceIntegrationTest extends TestCase
         ];
 
         $container = new ServiceManager($config);
-        $this->expectException(ServiceNotCreatedException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('class_map');
         $container->get(InvokableObject::class);
     }

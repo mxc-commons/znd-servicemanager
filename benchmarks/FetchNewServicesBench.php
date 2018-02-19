@@ -13,8 +13,8 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 use Zend\ServiceManager\ServiceManager;
 
 /**
- * @Revs(1000)
- * @Iterations(10)
+ * @Revs(100000)
+ * @Iterations(20)
  * @Warmup(2)
  */
 class FetchNewServicesBench

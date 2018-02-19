@@ -14,8 +14,8 @@ use Zend\ServiceManager\AbstractFactory\ConfigAbstractFactory;
 use Zend\ServiceManager\ServiceManager;
 
 /**
- * @Revs(1000)
- * @Iterations(10)
+ * @Revs(100000)
+ * @Iterations(20)
  * @Warmup(2)
  */
 class FetchNewServiceViaConfigAbstractFactoryBench
@@ -24,6 +24,7 @@ class FetchNewServiceViaConfigAbstractFactoryBench
      * @var ServiceManager
      */
     private $sm;
+    private $smCached;
 
     public function __construct()
     {
@@ -45,6 +46,8 @@ class FetchNewServiceViaConfigAbstractFactoryBench
                 ConfigAbstractFactory::class,
             ],
         ]);
+        $this->smCached = clone $this->sm;
+        $this->smCached->has('unknown service');
     }
 
     public function benchFetchServiceWithNoDependencies()
@@ -85,6 +88,48 @@ class FetchNewServiceViaConfigAbstractFactoryBench
     public function benchBuildServiceWithDependency()
     {
         $sm = clone $this->sm;
+
+        $sm->build(BenchAsset\ServiceWithDependency::class);
+    }
+
+    public function benchFetchServiceWithNoDependenciesCached()
+    {
+        $sm = clone $this->smCached;
+
+        $sm->get(BenchAsset\Dependency::class);
+    }
+
+    public function benchBuildServiceWithNoDependenciesCached()
+    {
+        $sm = clone $this->smCached;
+
+        $sm->build(BenchAsset\Dependency::class);
+    }
+
+    public function benchFetchServiceDependingOnConfigCached()
+    {
+        $sm = clone $this->smCached;
+
+        $sm->get(BenchAsset\ServiceDependingOnConfig::class);
+    }
+
+    public function benchBuildServiceDependingOnConfigCached()
+    {
+        $sm = clone $this->smCached;
+
+        $sm->build(BenchAsset\ServiceDependingOnConfig::class);
+    }
+
+    public function benchFetchServiceWithDependencyCached()
+    {
+        $sm = clone $this->smCached;
+
+        $sm->get(BenchAsset\ServiceWithDependency::class);
+    }
+
+    public function benchBuildServiceWithDependencyCached()
+    {
+        $sm = clone $this->smCached;
 
         $sm->build(BenchAsset\ServiceWithDependency::class);
     }

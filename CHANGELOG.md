@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## Version 0.3.1 - 2018-02-19
+
+## Added
+
+- nothing
+
+## Fixed
+
+- Added test and fixed that service manager accepted factories not implementing FactoryInterface
+- Added test and fixed that service manager accepted initializers not implementing InitializerInterface
+- Added test and fixed that service manager accepted delegator factories not implementing DelegatorFactoryInterface
+
+## Changed
+
+- Standardized exception used for invalid service manager configuration to InvalidArgumentException.
+- ServiceNotCreatedException now gets only thrown, if an external exception was caught.
+
+## Deprecated
+
+- nothing
+
+## Benchmark comparison
+
+See 0.2.0 below.
+
 
 ## Version 0.3.0
 
@@ -65,6 +90,7 @@ As of 0.1.0 we had the error that the test suites applied to zend-master and mxc
 completely in sync. This was corrected in this version. The corrected benchmark unreveals that
 setAlias and setOverrideAlias are much slower in zend-master than suggested by the 0.1.0 benchmark
 comparison.
+
 
         $ vendor\bin\phpbench report --file=..\all.master.xml --file=..\all.020.xml --report="compare"
         benchmark: AbstractFactoryCacheBench
@@ -228,8 +254,8 @@ comparison.
 ### Benchmark Comparsion zend-master vs. mxc-master
 Significant performance improvements currently are the creation of a new ServiceManager with several thousand items via call to configure() (3x faster) and service creation via the setter APIs (setService, setAlias, ...) which is between minimum 1.3x and maximum 18.0x as fast as zend-servicemanager. Most other sections profit a bit from the refactored handling of invokable and aliases.
 
-$ vendor\bin\phpbench report --file=..\zend.FetchNewServiceManager.xml --file=..\mxc.FetchNewServiceManager.xml --report=compare
-benchmark: FetchNewServiceManagerBench
+    $ vendor\bin\phpbench report --file=..\zend.FetchNewServiceManager.xml --file=..\mxc.FetchNewServiceManager.xml --report=compare
+    benchmark: FetchNewServiceManagerBench
     +----------------------------------+-----------------+----------------+
     | subject                          | suite:zend:mean | suite:mxc:mean |
     +----------------------------------+-----------------+----------------+

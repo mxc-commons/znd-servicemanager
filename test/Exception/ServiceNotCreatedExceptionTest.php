@@ -29,34 +29,4 @@ class ServiceNotCreatedExceptionTest extends TestCase
             $exception->getMessage()
         );
     }
-
-    public function testFromInvalidClass()
-    {
-        $exception = ServiceNotCreatedException::fromInvalidClass(stdClass::class);
-        self::assertInstanceOf(ServiceNotCreatedException::class, $exception);
-        self::assertSame(
-            sprintf(
-                'An invalid delegator factory was registered; resolved to class or function "%s" '
-                . 'which does not exist; please provide a valid function name or class name resolving '
-                . 'to an implementation of %s',
-                stdClass::class,
-                DelegatorFactoryInterface::class
-            ),
-            $exception->getMessage()
-        );
-    }
-
-    public function testFromInvalidInstance()
-    {
-        $exception = ServiceNotCreatedException::fromInvalidInstance(stdClass::class);
-        self::assertInstanceOf(ServiceNotCreatedException::class, $exception);
-        self::assertSame(
-            sprintf(
-                'A non-callable delegator, "%s", was provided; expected a callable or instance of "%s"',
-                'string',
-                DelegatorFactoryInterface::class
-            ),
-            $exception->getMessage()
-        );
-    }
 }

@@ -2,17 +2,20 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## Version 0.3.1
+## Version 0.3.1 - 2018-02-19
 
 ## Added
 
 - nothing
 
-## Changed
+## Fixed
 
 - Added test and fixed that service manager accepted factories not implementing FactoryInterface
 - Added test and fixed that service manager accepted initializers not implementing InitializerInterface
 - Added test and fixed that service manager accepted delegator factories not implementing DelegatorFactoryInterface
+
+## Changed
+
 - Standardized exception used for invalid service manager configuration to InvalidArgumentException.
 - ServiceNotCreatedException now gets only thrown, if an external exception was caught.
 

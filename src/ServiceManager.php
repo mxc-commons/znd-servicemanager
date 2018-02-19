@@ -31,6 +31,8 @@ use function is_string;
 use function spl_autoload_register;
 use function spl_object_hash;
 use function trigger_error;
+use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\ServiceManager\Initializer\InitializerInterface;
 
 /**
  * Service Manager.
@@ -226,10 +228,6 @@ class ServiceManager implements ServiceLocatorInterface
                 $this->aliases = $config['aliases'] + $this->aliases;
                 $this->mapAliasesToTargets();
             }
-            if (! empty($config['delegators'])) {
-                $this->delegators = array_merge_recursive($this->delegators, $config['delegators']);
-                $this->delegatorCallbackCache = [];
-            }
             if (! empty($config['factories'])) {
                 $this->factories = $config['factories'] + $this->factories;
             }
@@ -238,6 +236,10 @@ class ServiceManager implements ServiceLocatorInterface
             }
             if (! empty($config['shared'])) {
                 $this->shared = $config['shared'] + $this->shared;
+            }
+            if (! empty($config['delegators'])) {
+                $this->delegators = array_merge_recursive($this->delegators, $config['delegators']);
+                $this->delegatorCallbackCache = [];
             }
             if (! empty($config['lazy_services']['class_map'])) {
                 $this->lazyServices['class_map'] = isset($this->lazyServices['class_map'])
@@ -481,10 +483,11 @@ class ServiceManager implements ServiceLocatorInterface
 
         if (is_string($factory) && class_exists($factory)) {
             $factory = new $factory();
-            if (is_callable($factory)) {
+            if ($factory instanceof FactoryInterface) {
                 $this->factories[$name] = $factory;
+                return $factory($this->creationContext, $name, $options);
             }
-            return $factory($this->creationContext, $name, $options);
+            throw InvalidArgumentException::fromInvalidFactory($factory);
         }
 
         if (is_callable($factory)) {
@@ -640,6 +643,9 @@ class ServiceManager implements ServiceLocatorInterface
         foreach ($this->initializers as $idx => $initializer) {
             if (is_string($initializer) && class_exists($initializer)) {
                 $initializer = new $initializer();
+                if (! $initializer instanceof InitializerInterface) {
+                    throw InvalidArgumentException::fromInvalidInitializer($initializer);
+                }
             }
 
             if (is_callable($initializer)) {

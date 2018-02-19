@@ -867,6 +867,31 @@ trait CommonServiceLocatorBehaviorsTrait
         $sm->setAlias('alias', 'alias');
     }
 
+    public function testThrowOnFactoriesNotImplementingFactoryInterface()
+    {
+        $sm = $this->createContainer([
+            'factories' => [
+                'wrongFactory' => InvokableObject::class,
+            ],
+        ]);
+        self::expectException(InvalidArgumentException::class);
+        $sm->get('wrongFactory');
+    }
+
+    public function testThrowOnInitializersNotImplementingInitializerInterface()
+    {
+        $sm = $this->createContainer([
+            'factories' => [
+                'factory' => SampleFactory::class,
+            ],
+            'initializers' => [
+                InvokableObject::class
+            ]
+        ]);
+        self::expectException(InvalidArgumentException::class);
+        $sm->get('factory');
+    }
+
     public function testCoverageDepthFirstTaggingOnRecursiveAliasDefinitions()
     {
         $sm = $this->createContainer([

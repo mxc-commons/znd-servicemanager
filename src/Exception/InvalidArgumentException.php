@@ -10,6 +10,7 @@ namespace Zend\ServiceManager\Exception;
 use InvalidArgumentException as SplInvalidArgumentException;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\Initializer\InitializerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * @inheritDoc
@@ -27,6 +28,20 @@ class InvalidArgumentException extends SplInvalidArgumentException implements Ex
             . 'class name, a callable or an instance of "%s", but "%s" was received.',
             InitializerInterface::class,
             is_object($initializer) ? get_class($initializer) : gettype($initializer)
+        ));
+    }
+
+    /**
+     * @param mixed $factory
+     * @return self
+     */
+    public static function fromInvalidFactory($factory)
+    {
+        return new self(sprintf(
+            'An invalid factory was registered. Expected a valid function name, '
+            . 'class name, a callable or an instance of "%s", but "%s" was received.',
+            FactoryInterface::class,
+            is_object($factory) ? get_class($factory) : gettype($factory)
         ));
     }
 

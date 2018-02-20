@@ -9,9 +9,9 @@ develop:
 
 ## Version
 
-Version 0.3.0 created on 2018-02-17 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.4.0 created on 2018-02-20 by Frank Hein, maxence operations GmbH, Germany.
 
-This version is based on Zend Service Manager 3.3.2.
+This version is based on Zend Service Manager 3.3.2 and can be used as substitute for zend-servicemanager 3.x versions.
 
 ## Introduction
 
@@ -46,6 +46,9 @@ Our motivation to do this is our need for a fast servicemanager component and ou
     * delegators
     * invokables
     * abstract factories
+* Speed up service manager assets
+    * ConfigAbstractFactory (done with 0.4.0)
+    * ReflectionAbstractFactory
 
 Goal of our activities is to exploit PHP capabilities as far as possible for performance enhancements without giving up on backwards compatibility to
 zend-servicemanager 3.3.2 (currently). We are working on optimizing the PHP implementation in order to find out what the particular requirements for
@@ -115,17 +118,10 @@ each version.
 
 Enhancements:
 
-1. Refactor ConfigAbstractFactory for performance.
-2. Refactor ReflectionAbstractFactory for performance.
-3. Investigating: Provide benchmark tests for all features currently left out.
-4. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
-5. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
-6. Provide benchmarks which respect internal staging (i.e. configuration array only, aliases resolved, factories called, ...).
-7. Deploy test suite with mxc-servicemanager
-8. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
-9. Investigating: Introduce ServiceManager pre-compiler
+1. Refactor ReflectionAbstractFactory.
+2. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
+3. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
+4. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
+5. Investigating: Introduce ServiceManager pre-compiler
     (automatically and dynamically provide a service manager implementation which is optimized to support only the features actually used by the application)
-
-
-Ongoing: Provide comparison benchmarks for each release.
-
+6. Provide tests and benchmarks for all features and changes provided by this fork.

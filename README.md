@@ -9,7 +9,7 @@ develop:
 
 ## Version
 
-Release 0.4.0 created on 2018-02-20 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.4.1 created on 2018-02-20 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.3.2 and can be used as substitute for zend-servicemanager 3.x versions.
 
@@ -71,11 +71,11 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.2"
+        "mxc-commons/mxc-servicemanager": "^0.4"
     }
     ```
 
-2. Configure PSR-4 compliant autoloading of the namespace MxcCommons\ServiceManager. If you use the recommended way of composer based autoloading, add this configuration to your composer.json
+2. Configure PSR-4 compliant autoloading of the namespace Zend\ServiceManager. If you use the recommended way of composer based autoloading, add this configuration to your composer.json
 
     ```json
     "autoload": {

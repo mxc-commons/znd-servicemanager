@@ -71,11 +71,11 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.2"
+        "mxc-commons/mxc-servicemanager": "^0.4"
     }
     ```
 
-2. Configure PSR-4 compliant autoloading of the namespace MxcCommons\ServiceManager. If you use the recommended way of composer based autoloading, add this configuration to your composer.json
+2. Configure PSR-4 compliant autoloading of the namespace Zend\ServiceManager. If you use the recommended way of composer based autoloading, add this configuration to your composer.json
 
     ```json
     "autoload": {

@@ -47,6 +47,8 @@ class FetchNewServicesBench
             ],
             'cache_abstract_factories_on_startup' => true,
         ]);
+        $this->sm2 = clone $this->sm;
+        $this->sm2->build('foo');
     }
 
     public function benchFetchFactory1()
@@ -141,6 +143,14 @@ class FetchNewServicesBench
     {
         // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
+
+        $sm->get('foo');
+    }
+
+    public function benchFetchAbstractFactoryFoo2()
+    {
+        // @todo @link https://github.com/phpbench/phpbench/issues/304
+        $sm = clone $this->sm2;
 
         $sm->get('foo');
     }

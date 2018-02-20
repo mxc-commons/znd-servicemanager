@@ -560,6 +560,8 @@ trait CommonServiceLocatorBehaviorsTrait
         $initializer,
         $contains = 'invalid initializer'
     ) {
+        $this->expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage($contains);
         $sm = $this->createContainer([
             'factories' => [
                 'factory' => SampleFactory::class,
@@ -568,9 +570,6 @@ trait CommonServiceLocatorBehaviorsTrait
                 $initializer,
             ],
         ]);
-        $this->expectException(InvalidArgumentException::class);
-        self::expectExceptionMessage($contains);
-        $sm->get('factory');
     }
 
     public function testGetRaisesExceptionWhenNoFactoryIsResolved()
@@ -896,16 +895,12 @@ trait CommonServiceLocatorBehaviorsTrait
 
     public function testThrowOnInitializersNotImplementingInitializerInterface()
     {
+        self::expectException(InvalidArgumentException::class);
         $sm = $this->createContainer([
-            'factories' => [
-                'factory' => SampleFactory::class,
-            ],
             'initializers' => [
                 InvokableObject::class
             ]
         ]);
-        self::expectException(InvalidArgumentException::class);
-        $sm->get('factory');
     }
 
     public function testCoverageDepthFirstTaggingOnRecursiveAliasDefinitions()

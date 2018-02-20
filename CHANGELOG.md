@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## Version 0.4.0 - 2018-02-19: ConfigAbstractFactory and Benchmarking
+## Version 0.4.0 - 2018-02-20: ConfigAbstractFactory
 
 ## Added
 

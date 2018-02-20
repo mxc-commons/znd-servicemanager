@@ -58,6 +58,11 @@ class ServiceManager implements ServiceLocatorInterface
     protected $abstractFactories = [];
 
     /**
+     * @var Factory\AbstractFactoryInterface[]
+     */
+    protected $registeredAbstractFactories = [];
+
+    /**
      * Set to true, service manager will mimic zend-servicemanager's behaviour
      * to pre-instantiate abstract factories on startup. This setting is merely
      * used for comparison benchmarks.
@@ -345,29 +350,20 @@ class ServiceManager implements ServiceLocatorInterface
             $this->lazyServices = $config['lazy_services'] + $this->lazyServices;
         }
 
-        if (isset($config['cache_abstract_factories_on_startup'])) {
-            $this->cacheAbstractFactoriesOnStartup = $config['cache_abstract_factories_on_startup'];
-        }
-
         if (isset($config['shared_by_default'])) {
             $this->sharedByDefault = $config['shared_by_default'];
         }
 
         if (! empty($config['abstract_factories'])) {
-            foreach ($config['abstract_factories'] as $factory) {
-                if (is_string($factory) && class_exists($factory)) {
-                    $this->abstractFactories[$factory] = $factory;
-                } elseif ($factory instanceof Factory\AbstractFactoryInterface) {
-                    $this->abstractFactories[spl_object_hash($factory)] = $factory;
-                } else {
-                    throw InvalidArgumentException::fromInvalidAbstractFactory($factory);
-                }
-            }
+            $this->registerAbstractFactories($config['abstract_factories']);
+        }
+        if (isset($config['cache_abstract_factories_on_startup'])) {
+            $this->cacheAbstractFactoriesOnStartup = $config['cache_abstract_factories_on_startup'];
         }
 
-        if ($this->cacheAbstractFactoriesOnStartup) {
-            $this->has('__unknown___\___service___');
-        }
+//         if ($this->cacheAbstractFactoriesOnStartup) {
+//             $this->cacheAbstractFactories();
+//         }
 
         if (! empty($config['initializers'])) {
             $this->initializers = $config['initializers'] + $this->initializers;
@@ -572,6 +568,7 @@ class ServiceManager implements ServiceLocatorInterface
         return $creationCallback($this->creationContext, $name, $creationCallback, $options);
     }
 
+
     /**
      * Checks if an abstract factory can deliver a service with name provided
      *
@@ -585,38 +582,115 @@ class ServiceManager implements ServiceLocatorInterface
      *
      * 1. Registered callables do not need caching
      * 2. Registered classes are instantiated and checked for compliance
-     * 3. Objects are cached in $this->cachedAbstractFactories under their
-     *    spl_object_hash
      * 4. Their abstractFactories entry gets replaced with the object
      * 5. If abstract factory can create service of name $name, it gets
-     *    registered as a factory for that name and deleted from
-     *    the abstractFactories
+     *    registered as a factory for that name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    private function registerAbstractFactories(array $abstractFactories)
+    {
+        foreach ($abstractFactories as $abstractFactory) {
+            if (is_string($abstractFactory)) {
+                if (! isset($this->registeredAbstractFactories[$abstractFactory])) {
+                    $this->registeredAbstractFactories[$abstractFactory] = $abstractFactory;
+                }
+            } elseif (is_callable($abstractFactory)) {
+                $this->abstractFactories[spl_object_hash($abstractFactory)] = $abstractFactory;
+                continue;
+            }
+            throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
+        }
+    }
+
+    /**
+     * Checks if an abstract factory can deliver a service with name provided
+     *
+     * Abstract factories get instantiated and cached for later use as necessary
+     *
+     * $this->abstractFactories contains all registered distinct abstractFactories,
+     * which can be registered as callable implementing Factory\AbstractFactory or
+     * FQCN of a class implementing Factory\AbstractFactoryInterface.
+     *
+     * The caching mechanismus works as follows:
+     *
+     * 1. Registered callables do not need caching
+     * 2. Registered classes are instantiated and checked for compliance
+     * 4. Their abstractFactories entry gets replaced with the object
+     * 5. If abstract factory can create service of name $name, it gets
+     *    registered as a factory for that name.
      *
      * @param string $name
      * @return boolean
      */
     private function checkServiceFromAbstractFactory($name)
     {
-
-        foreach ($this->abstractFactories as $idx => $abstractFactory) {
-            if (is_string($abstractFactory)) {
-                $key = $abstractFactory;
-                $abstractFactory = new $abstractFactory;
-                if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
-                    $this->abstractFactories[$idx] = $abstractFactory;
-                } else {
-                    throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
-                }
-            }
-
+        foreach ($this->abstractFactories as $abstractFactory) {
             if ($abstractFactory->canCreate($this->creationContext, $name)) {
-                $this->factories[$name] = $abstractFactory;
                 return true;
+            }
+        }
+
+        foreach ($this->registeredAbstractFactories as $idx => $abstractFactory) {
+            $abstractFactory = new $abstractFactory;
+            $this->registeredAbstractFactories[$idx] = $abstractFactory;
+            if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+                $this->abstractFactories[spl_object_hash($abstractFactory)] = $abstractFactory;
+                if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                    return true;
+                }
+            } else {
+                throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
             }
         }
         return false;
     }
 
+//     private function resolveAbstractFactories(array $abstractFactories)
+//     {
+//         foreach ($abstractFactories as $abstractFactory) {
+//             if (is_string($abstractFactory) && class_exists($abstractFactory)) {
+//                 //Cached string
+//                 if (! isset($this->cachedAbstractFactories[$abstractFactory])) {
+//                     $this->cachedAbstractFactories[$abstractFactory] = new $abstractFactory();
+//                 }
+
+//                 $abstractFactory = $this->cachedAbstractFactories[$abstractFactory];
+//             }
+
+//             if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+//                 $abstractFactoryObjHash = spl_object_hash($abstractFactory);
+//                 $this->abstractFactories[$abstractFactoryObjHash] = $abstractFactory;
+//                 continue;
+//             }
+
+//             // Error condition; let's find out why.
+
+//             // If we still have a string, we have a class name that does not resolve
+//             if (is_string($abstractFactory)) {
+//                 throw new InvalidArgumentException(
+//                     sprintf(
+//                         'An invalid abstract factory was registered; resolved to class "%s" ' .
+//                         'which does not exist; please provide a valid class name resolving ' .
+//                         'to an implementation of %s',
+//                         $abstractFactory,
+//                         AbstractFactoryInterface::class
+//                         )
+//                     );
+//             }
+
+//             // Otherwise, we have an invalid type.
+//             throw new InvalidArgumentException(
+//                 sprintf(
+//                     'An invalid abstract factory was registered. Expected an instance of "%s", ' .
+//                     'but "%s" was received',
+//                     AbstractFactoryInterface::class,
+//                     (is_object($abstractFactory) ? get_class($abstractFactory) : gettype($abstractFactory))
+//                     )
+//                 );
+//         }
+//     }
 
     /**
      * Checks if an abstract factory can deliver a service with name provided
@@ -630,20 +704,21 @@ class ServiceManager implements ServiceLocatorInterface
      */
     private function createServiceFromAbstractFactory($name, array $options = null)
     {
-        foreach ($this->abstractFactories as $idx => $abstractFactory) {
-            if (is_string($abstractFactory)) {
-                $key = $abstractFactory;
-                $abstractFactory = new $abstractFactory;
-                if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
-                    $this->abstractFactories[$idx] = $abstractFactory;
-                } else {
-                    throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
-                }
-            }
-
+        foreach ($this->abstractFactories as $abstractFactory) {
             if ($abstractFactory->canCreate($this->creationContext, $name)) {
-                $this->factories[$name] = $abstractFactory;
-                return $abstractFactory($this->creationContext, $name, $options);
+                return $abstractFactory($this->creationContext, $name);
+            }
+        }
+        foreach ($this->registeredAbstractFactories as $idx => $abstractFactory) {
+            $abstractFactory = new $abstractFactory;
+            $this->registeredAbstractFactories[$idx] = $abstractFactory;
+            if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+                $this->abstractFactories[spl_object_hash($abstractFactory)] = $abstractFactory;
+                if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                    return $abstractFactory($this->creationContext, $name);
+                }
+            } else {
+                throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
             }
         }
         throw ServiceNotFoundException::fromUnknownService($name);

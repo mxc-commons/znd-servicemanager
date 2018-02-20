@@ -239,7 +239,7 @@ class ConfigAbstractFactoryTest extends TestCase
             ]
         );
         $this->expectException(ServiceNotCreatedException::class);
-        $this->expectExceptionMessage('Dependencies config must exist and be an array');
+        $this->expectExceptionMessage('Dependencies config must hold a key');
 
         $abstractFactory($serviceManager, 'Dirk_Gently');
     }
@@ -257,9 +257,9 @@ class ConfigAbstractFactoryTest extends TestCase
             ]
         );
         $this->expectException(ServiceNotCreatedException::class);
-        $this->expectExceptionMessage('Dependencies config must exist and be an array');
+        $this->expectExceptionMessage('must be an array or ArrayObject.');
 
-        $abstractFactory($serviceManager, 'Dirk_Gently');
+        $abstractFactory($serviceManager, 'DirkGently');
     }
 
     public function testExceptsWhenServiceConfigForRequestedNameIsNotArrayOfStrings()

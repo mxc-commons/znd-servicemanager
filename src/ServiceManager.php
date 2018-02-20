@@ -58,6 +58,11 @@ class ServiceManager implements ServiceLocatorInterface
     protected $abstractFactories = [];
 
     /**
+     * @var boolean[]
+     */
+    private $abstractFactoryTags = [];
+
+    /**
      * A list of aliases
      *
      * Should map one alias to a service name, or another alias (aliases are recursively resolved)
@@ -170,8 +175,13 @@ class ServiceManager implements ServiceLocatorInterface
             $this->mapAliasesToTargets();
         }
 
-        $config['abstract_factories'] = ($config['abstract_factories'] ?? []) + $this->abstractFactories;
+        $abstractFactories = $this->abstractFactories;
         $this->abstractFactories = [];
+        $this->registerAbstractFactories($abstractFactories);
+
+        $initializers = $this->initializers;
+        $this->initializers = [];
+        $this->registerInitializers($initializers);
 
         $this->configure($config);
     }
@@ -341,20 +351,13 @@ class ServiceManager implements ServiceLocatorInterface
         }
 
         if (! empty($config['abstract_factories'])) {
-            foreach ($config['abstract_factories'] as $factory) {
-                if (is_string($factory) && class_exists($factory)) {
-                    $this->abstractFactories[$factory] = $factory;
-                } elseif ($factory instanceof Factory\AbstractFactoryInterface) {
-                    $this->abstractFactories[spl_object_hash($factory)] = $factory;
-                } else {
-                    throw InvalidArgumentException::fromInvalidAbstractFactory($factory);
-                }
-            }
+            $this->registerAbstractFactories($config['abstract_factories']);
         }
 
         if (! empty($config['initializers'])) {
-            $this->initializers = $config['initializers'] + $this->initializers;
+            $this->registerInitializers($config['initializers']);
         }
+
         $this->configured = true;
         return $this;
     }
@@ -437,7 +440,12 @@ class ServiceManager implements ServiceLocatorInterface
             return true;
         }
 
-        return $this->checkServiceFromAbstractFactory($resolvedName);
+        foreach ($this->abstractFactories as $abstractFactory) {
+            if ($abstractFactory->canCreate($this->creationContext, $resolvedName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -465,7 +473,9 @@ class ServiceManager implements ServiceLocatorInterface
             throw ServiceNotCreatedException::fromException($resolvedName, $exception);
         }
 
-        $this->applyInitializers($object);
+        foreach ($this->initializers as $initializer) {
+            $initializer($this->creationContext, $object);
+        }
 
         return $object;
     }
@@ -498,7 +508,30 @@ class ServiceManager implements ServiceLocatorInterface
             return $options === null ? new $invokable() : new $invokable($options);
         }
 
-        return $this->createServiceFromAbstractFactory($name, $options);
+        foreach ($this->abstractFactories as $idx => $abstractFactory) {
+            if (is_string($abstractFactory)) {
+                $abstractFactory = new $this->abstractFactories[$idx];
+                if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+                    $this->abstractFactories[$idx] = $abstractFactory;
+                } else {
+                    throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
+                }
+            }
+            if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                if (! isset($this->factories[$name])) {
+                    $this->factories[$name] = $abstractFactory;
+                }
+                return $abstractFactory($this->creationContext, $name, $options);
+            }
+        }
+
+        foreach ($this->abstractFactories as $abstractFactory) {
+            if ($abstractFactory->canCreate($this->creationContext, $name)) {
+                return $abstractFactory($this->creationContext, $name, $options);
+            }
+        }
+
+        throw ServiceNotFoundException::fromUnknownService($name);
     }
 
     /**
@@ -555,6 +588,7 @@ class ServiceManager implements ServiceLocatorInterface
         return $creationCallback($this->creationContext, $name, $creationCallback, $options);
     }
 
+
     /**
      * Checks if an abstract factory can deliver a service with name provided
      *
@@ -568,68 +602,53 @@ class ServiceManager implements ServiceLocatorInterface
      *
      * 1. Registered callables do not need caching
      * 2. Registered classes are instantiated and checked for compliance
-     * 3. Objects are cached in $this->cachedAbstractFactories under their
-     *    spl_object_hash
      * 4. Their abstractFactories entry gets replaced with the object
      * 5. If abstract factory can create service of name $name, it gets
-     *    registered as a factory for that name and deleted from
-     *    the abstractFactories
+     *    registered as a factory for that name.
      *
      * @param string $name
      * @return boolean
      */
-    private function checkServiceFromAbstractFactory($name)
+    private function registerAbstractFactories(array $abstractFactories)
     {
-
-        foreach ($this->abstractFactories as $idx => $abstractFactory) {
-            if (is_string($abstractFactory)) {
-                $key = $abstractFactory;
-                $abstractFactory = new $abstractFactory;
-                if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
-                    $this->abstractFactories[$idx] = $abstractFactory;
-                } else {
-                    throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
+        foreach ($abstractFactories as $abstractFactory) {
+            if (is_string($abstractFactory) && class_exists($abstractFactory)) {
+                if (isset($this->abstractFactoryTags[$abstractFactory])) {
+                    continue;
                 }
+                $this->abstractFactoryTags[$abstractFactory] = true;
+                $abstractFactory = new $abstractFactory;
             }
-
-            if ($abstractFactory->canCreate($this->creationContext, $name)) {
-                $this->factories[$name] = $abstractFactory;
-                return true;
+            if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
+                $this->abstractFactories[spl_object_hash($abstractFactory)] = $abstractFactory;
+            } else {
+                throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
             }
         }
-        return false;
     }
 
-
     /**
-     * Checks if an abstract factory can deliver a service with name provided
-     * and return the service if so
+     * Applies initializers to a supplied object
      *
-     * Abstract factories get instantiated and cached for later use as necessary
+     * Initializers are instantiated and cached for later use as necessary
      *
-     * @param string $name
-     * @param array $options
-     * @return misc
+     * @param object
      */
-    private function createServiceFromAbstractFactory($name, array $options = null)
+    private function registerInitializers(array $initializers)
     {
-        foreach ($this->abstractFactories as $idx => $abstractFactory) {
-            if (is_string($abstractFactory)) {
-                $key = $abstractFactory;
-                $abstractFactory = new $abstractFactory;
-                if ($abstractFactory instanceof Factory\AbstractFactoryInterface) {
-                    $this->abstractFactories[$idx] = $abstractFactory;
-                } else {
-                    throw InvalidArgumentException::fromInvalidAbstractFactory($abstractFactory);
+        foreach ($initializers as $initializer) {
+            if (is_string($initializer) && class_exists($initializer)) {
+                $initializer = new $initializer();
+                if (! ($initializer instanceof InitializerInterface)) {
+                    throw InvalidArgumentException::fromInvalidInitializer($initializer);
                 }
             }
-
-            if ($abstractFactory->canCreate($this->creationContext, $name)) {
-                $this->factories[$name] = $abstractFactory;
-                return $abstractFactory($this->creationContext, $name, $options);
+            if (is_callable($initializer)) {
+                $this->initializers[] = $initializer;
+            } else {
+                throw InvalidArgumentException::fromInvalidInitializer($initializer);
             }
         }
-        throw ServiceNotFoundException::fromUnknownService($name);
     }
 
     /**
@@ -752,13 +771,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function addAbstractFactory($factory)
     {
-        if (is_string($factory) && class_exists($factory)) {
-            $this->abstractFactories[$factory] = $factory;
-        } elseif ($factory instanceof Factory\AbstractFactoryInterface) {
-            $this->abstractFactories[spl_object_hash($factory)] = $factory;
-        } else {
-            throw InvalidArgumentException::fromInvalidAbstractFactory($factory);
-        }
+        $this->registerAbstractFactories([$factory]);
     }
 
     /**
@@ -783,7 +796,7 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function addInitializer($initializer)
     {
-        $this->initializers[] = $initializer;
+        $this->registerInitializers([$initializer]);
     }
 
     /**

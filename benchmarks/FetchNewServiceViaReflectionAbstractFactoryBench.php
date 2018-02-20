@@ -14,8 +14,8 @@ use Zend\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Zend\ServiceManager\ServiceManager;
 
 /**
- * @Revs(1000)
- * @Iterations(10)
+ * @Revs(100000)
+ * @Iterations(20)
  * @Warmup(2)
  */
 class FetchNewServiceViaReflectionAbstractFactoryBench
@@ -34,6 +34,7 @@ class FetchNewServiceViaReflectionAbstractFactoryBench
             'abstract_factories' => [
                 ReflectionBasedAbstractFactory::class,
             ],
+            'cache_abstract_factories_on_startup' => true,
         ]);
     }
 

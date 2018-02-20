@@ -14,8 +14,8 @@ use Zend\ServiceManager\AbstractFactory\ConfigAbstractFactory;
 use Zend\ServiceManager\ServiceManager;
 
 /**
- * @Revs(1000)
- * @Iterations(10)
+ * @Revs(100000)
+ * @Iterations(20)
  * @Warmup(2)
  */
 class FetchNewServiceViaConfigAbstractFactoryBench
@@ -24,6 +24,7 @@ class FetchNewServiceViaConfigAbstractFactoryBench
      * @var ServiceManager
      */
     private $sm;
+    private $smCached;
 
     public function __construct()
     {
@@ -44,6 +45,7 @@ class FetchNewServiceViaConfigAbstractFactoryBench
             'abstract_factories' => [
                 ConfigAbstractFactory::class,
             ],
+            'cache_abstract_factories_on_startup' => true,
         ]);
     }
 

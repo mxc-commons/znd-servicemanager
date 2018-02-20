@@ -11,7 +11,6 @@ use ArrayObject;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
-use function array_key_exists;
 use function array_map;
 use function array_values;
 use function is_array;
@@ -19,6 +18,41 @@ use function json_encode;
 
 final class ConfigAbstractFactory implements AbstractFactoryInterface
 {
+    private $config = null;
+    private $dependencies = null;
+    private $serviceDependencies = null;
+
+
+    private function getConfig(\Interop\Container\ContainerInterface $container, $requestedName)
+    {
+        if (! $container->has('config')) {
+            throw new ServiceNotCreatedException('Cannot find a config array in the container.');
+        }
+
+        $config = $container->get('config');
+        if (! (is_array($config) || $config instanceof ArrayObject)) {
+            throw new ServiceNotCreatedException('Config must be an array or an instance of ArrayObject.');
+        }
+
+        if (! isset($config[self::class])) {
+            throw new ServiceNotCreatedException('Cannot find a `' . self::class . '` key in the config array.');
+        }
+
+//         if (! isset($this->dependencies[$requestedName])) {
+//             throw new ServiceNotCreatedException(
+//                 sprintf('Dependencies config must hold a key %s.', $requestedName)
+//             );
+//         }
+
+//         if (! is_array($this->dependencies[$requestedName])) {
+//             throw new ServiceNotCreatedException(
+//                 sprintf('Dependencies config for %s must be an array or ArrayObject.', $requestedName)
+//             );
+//         }
+        $this->dependencies = $config[self::class];
+        $this->config = $config;
+    }
+
     /**
      * Factory can create the service if there is a key for it in the config
      *
@@ -26,13 +60,8 @@ final class ConfigAbstractFactory implements AbstractFactoryInterface
      */
     public function canCreate(\Interop\Container\ContainerInterface $container, $requestedName)
     {
-        if (! $container->has('config') || ! array_key_exists(self::class, $container->get('config'))) {
-            return false;
-        }
-        $config = $container->get('config');
-        $dependencies = $config[self::class];
-
-        return is_array($dependencies) && array_key_exists($requestedName, $dependencies);
+        $this->getConfig($container, $requestedName);
+        return isset($this->dependencies[$requestedName]);
     }
 
     /**
@@ -40,38 +69,35 @@ final class ConfigAbstractFactory implements AbstractFactoryInterface
      */
     public function __invoke(\Interop\Container\ContainerInterface $container, $requestedName, array $options = null)
     {
-        if (! $container->has('config')) {
-            throw new ServiceNotCreatedException('Cannot find a config array in the container');
+        if ($this->config === null) {
+            $this->getConfig($container, $requestedName);
         }
 
-        $config = $container->get('config');
-
-        if (! (is_array($config) || $config instanceof ArrayObject)) {
-            throw new ServiceNotCreatedException('Config must be an array or an instance of ArrayObject');
+        if (! is_array($this->dependencies)) {
+            throw new ServiceNotCreatedException('Dependencies config must exist and be an array or ArrayObject.');
         }
 
-        if (! array_key_exists(self::class, $config)) {
-            throw new ServiceNotCreatedException('Cannot find a `' . self::class . '` key in the config array');
+        if (! isset($this->dependencies[$requestedName])) {
+            throw new ServiceNotCreatedException(
+                sprintf('Dependencies config must hold a key %s.', $requestedName)
+            );
         }
 
-        $dependencies = $config[self::class];
-
-        if (! is_array($dependencies)
-            || ! array_key_exists($requestedName, $dependencies)
-            || ! is_array($dependencies[$requestedName])
-        ) {
-            throw new ServiceNotCreatedException('Dependencies config must exist and be an array');
+        if (! is_array($this->dependencies[$requestedName])) {
+            throw new ServiceNotCreatedException(
+                sprintf('Dependencies config for %s must be an array or ArrayObject.', $requestedName)
+            );
         }
 
-        $serviceDependencies = $dependencies[$requestedName];
 
-        if ($serviceDependencies !== array_values(array_map('strval', $serviceDependencies))) {
-            $problem = json_encode(array_map('gettype', $serviceDependencies));
-            throw new ServiceNotCreatedException('Service message must be an array of strings, ' . $problem . ' given');
+        $this->serviceDependencies = $this->dependencies[$requestedName];
+        if ($this->serviceDependencies !== array_values(array_map('strval', $this->serviceDependencies))) {
+            $problem = json_encode(array_map('gettype', $this->serviceDependencies));
+            throw new ServiceNotCreatedException(
+                'Service message must be an array of strings, ' . $problem . ' given'
+            );
         }
-
-        $arguments = array_map([$container, 'get'], $serviceDependencies);
-
+        $arguments = array_map([$container, 'get'], $this->serviceDependencies);
         return new $requestedName(...$arguments);
     }
 }

@@ -2,27 +2,210 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## Version 0.5.0 - 2018-02-22: Final version without BC break
+
+### Benchmark Comparison zend-master vs. mxc-master
+
+We provide two benchmark comparison, one sorted by benchmark, one sorted descending by performance gain factor.
+The benchmark comparisonsare based on a patched version of PHPBench 0.15-dev. The patch adds the `diff` column and sorts descendig by this
+column. All tests were done with PHPBench 0.15-dev. The benchmark suite used was backported to zend:master.
+
+#### By performance gain factor
+
+    $ vendor\bin\phpbench report --file=..\all.050.xml --file=..\all.zend.xml --report="extends: compare, compare: tag, cols: ["benchmark", "subject"]
+    +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
+    | benchmark                                                   | subject                             | diff   | tag:mxc:mean | tag:zend:mean |
+    +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
+    | SetNewServicesBench                                         | benchOverrideAlias                  | 33.34x | 1.949μs      | 64.965μs      |
+    | SetNewServicesBench                                         | benchSetAlias                       | 9.66x  | 1.949μs      | 18.828μs      |
+    | SetNewServicesBench                                         | benchSetInvokableClass              | 4.34x  | 1.224μs      | 5.311μs       |
+    | FetchNewServiceManagerBench                                 | benchFetchServiceManagerCreation    | 4.09x  | 228.723μs    | 935.954μs     |
+    | SetNewServicesBench                                         | benchAddAbstractFactoryByClassName  | 4.09x  | 0.808μs      | 3.304μs       |
+    | SetNewServicesBench                                         | benchSetFactory                     | 3.79x  | 1.136μs      | 4.304μs       |
+    | SetNewServicesBench                                         | benchSetService                     | 3.30x  | 0.596μs      | 1.968μs       |
+    | SetNewServicesBench                                         | benchAddInitializerByInstance       | 2.01x  | 0.829μs      | 1.668μs       |
+    | FetchNewServicesBench                                       | benchBuildMultiDelegatorCached      | 1.75x  | 3.449μs      | 6.053μs       |
+    | FetchNewServicesBench                                       | benchFetchMultiDelegatorCached      | 1.70x  | 3.872μs      | 6.572μs       |
+    | SetNewServicesBench                                         | benchAddAbstractFactoryByInstance   | 1.65x  | 1.691μs      | 2.794μs       |
+    | FetchNewServicesBench                                       | benchFetchInvokable1                | 1.65x  | 2.022μs      | 3.338μs       |
+    | SetNewServicesBench                                         | benchAddInitializerByClassName      | 1.62x  | 1.438μs      | 2.327μs       |
+    | FetchNewServicesBench                                       | benchBuildInvokable1                | 1.58x  | 1.669μs      | 2.641μs       |
+    | SetNewServicesBench                                         | benchAddMultiDelegator              | 1.53x  | 2.252μs      | 3.447μs       |
+    | FetchNewServicesBench                                       | benchBuildDelegatorCached           | 1.47x  | 2.627μs      | 3.868μs       |
+    | SetNewServicesBench                                         | benchAddDelegator                   | 1.44x  | 2.398μs      | 3.444μs       |
+    | FetchNewServicesBench                                       | benchFetchDelegatorCached           | 1.43x  | 3.075μs      | 4.410μs       |
+    | FetchNewServicesBench                                       | benchFetchLazyServiceCached         | 1.39x  | 4.941μs      | 6.892μs       |
+    | FetchNewServicesBench                                       | benchBuildLazyServiceCached         | 1.32x  | 4.317μs      | 5.709μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchFetchServiceWithNoDependencies | 1.23x  | 4.340μs      | 5.343μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchBuildServiceWithNoDependencies | 1.22x  | 3.936μs      | 4.800μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchBuildServiceWithDependency     | 1.21x  | 4.502μs      | 5.435μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchFetchServiceWithDependency     | 1.20x  | 4.964μs      | 5.958μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchFetchServiceDependingOnConfig  | 1.20x  | 4.996μs      | 5.989μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchBuildServiceDependingOnConfig  | 1.19x  | 4.562μs      | 5.442μs       |
+    | FetchNewServicesBench                                       | benchFetchRecursiveFactoryAlias1    | 1.18x  | 2.053μs      | 2.432μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchFetchServiceWithNoDependencies | 1.18x  | 3.261μs      | 3.851μs       |
+    | FetchNewServicesBench                                       | benchBuildRecursiveFactoryAlias2    | 1.18x  | 2.060μs      | 2.430μs       |
+    | FetchNewServicesBench                                       | benchBuildRecursiveFactoryAlias1    | 1.18x  | 2.058μs      | 2.421μs       |
+    | FetchNewServicesBench                                       | benchFetchRecursiveFactoryAlias2    | 1.18x  | 2.070μs      | 2.434μs       |
+    | FetchNewServicesBench                                       | benchFetchFactoryAlias1             | 1.17x  | 2.057μs      | 2.413μs       |
+    | FetchNewServicesBench                                       | benchBuildFactoryAlias1             | 1.17x  | 2.056μs      | 2.407μs       |
+    | FetchNewServicesBench                                       | benchBuildFactory1                  | 1.14x  | 2.103μs      | 2.391μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchFetchServiceWithDependency     | 1.13x  | 5.107μs      | 5.766μs       |
+    | FetchNewServicesBench                                       | benchFetchFactory1                  | 1.12x  | 2.513μs      | 2.806μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchFetchServiceDependingOnConfig  | 1.10x  | 6.429μs      | 7.071μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchFetchServiceDependingOnConfig  | 1.09x  | 5.123μs      | 5.602μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchBuildServiceWithNoDependencies | 1.09x  | 3.101μs      | 3.382μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchFetchServiceWithDependency     | 1.08x  | 7.753μs      | 8.406μs       |
+    | HasBench                                                    | benchHasRecursiveAlias2             | 1.08x  | 0.493μs      | 0.534μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchFetchServiceWithNoDependencies | 1.08x  | 4.546μs      | 4.923μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchFetchServiceWithNoDependencies | 1.08x  | 3.048μs      | 3.299μs       |
+    | HasBench                                                    | benchHasRecursiveAlias1             | 1.07x  | 0.499μs      | 0.534μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchBuildServiceDependingOnConfig  | 1.06x  | 6.212μs      | 6.558μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchBuildServiceWithDependency     | 1.05x  | 4.859μs      | 5.112μs       |
+    | HasBench                                                    | benchHasAlias1                      | 1.05x  | 0.502μs      | 0.527μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchBuildServiceDependingOnConfig  | 1.05x  | 4.900μs      | 5.133μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchFetchServiceWithDependency     | 1.04x  | 7.638μs      | 7.955μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchBuildServiceWithDependency     | 1.04x  | 7.506μs      | 7.816μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchFetchServiceDependingOnConfig  | 1.04x  | 6.462μs      | 6.710μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchBuildServiceWithNoDependencies | 1.03x  | 4.326μs      | 4.473μs       |
+    | HasBench                                                    | benchHasInvokable1                  | 1.02x  | 0.526μs      | 0.537μs       |
+    | FetchCachedServicesBench                                    | benchFetchDelegatorService          | 1.01x  | 0.415μs      | 0.420μs       |
+    | FetchNewServicesBench                                       | benchBuildAbstractFactoryFoo        | 1.01x  | 1.842μs      | 1.862μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchBuildServiceDependingOnConfig  | 1.00x  | 6.049μs      | 6.063μs       |
+    | FetchNewServicesBench                                       | benchFetchAbstractFactoryFooCached  | 1.00x  | 2.307μs      | 2.309μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchBuildServiceWithDependency     | 1.00x  | 7.379μs      | 7.378μs       |
+    | FetchNewServicesBench                                       | benchFetchLazyService               | 1.00x  | 204.750μs    | 204.562μs     |
+    | FetchNewServicesBench                                       | benchFetchAbstractFactoryFoo        | 0.99x  | 2.314μs      | 2.301μs       |
+    | FetchNewServicesBench                                       | benchBuildLazyService               | 0.99x  | 203.850μs    | 202.212μs     |
+    | FetchNewServicesBench                                       | benchFetchService1                  | 0.99x  | 0.401μs      | 0.397μs       |
+    | FetchCachedServicesBench                                    | benchFetchInvokable1                | 0.99x  | 0.413μs      | 0.408μs       |
+    | FetchCachedServicesBench                                    | benchFetchService1                  | 0.98x  | 0.412μs      | 0.405μs       |
+    | FetchCachedServicesBench                                    | benchFetchRecursiveAlias2           | 0.98x  | 0.407μs      | 0.399μs       |
+    | FetchCachedServicesBench                                    | benchFetchAlias1                    | 0.98x  | 0.406μs      | 0.397μs       |
+    | FetchNewServicesBench                                       | benchFetchMultiDelegator            | 0.97x  | 9.064μs      | 8.810μs       |
+    | FetchCachedServicesBench                                    | benchFetchLazyService               | 0.97x  | 0.410μs      | 0.398μs       |
+    | FetchCachedServicesBench                                    | benchFetchAbstractFactoryService    | 0.97x  | 0.412μs      | 0.399μs       |
+    | FetchCachedServicesBench                                    | benchFetchRecursiveAlias1           | 0.96x  | 0.415μs      | 0.400μs       |
+    | FetchCachedServicesBench                                    | benchFetchMultiDelegatorService     | 0.96x  | 0.412μs      | 0.397μs       |
+    | FetchNewServicesBench                                       | benchBuildMultiDelegator            | 0.96x  | 8.660μs      | 8.336μs       |
+    | FetchCachedServicesBench                                    | benchFetchFactory1                  | 0.96x  | 0.416μs      | 0.398μs       |
+    | HasBench                                                    | benchHasNot                         | 0.95x  | 0.856μs      | 0.814μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchBuildServiceWithNoDependencies | 0.95x  | 2.885μs      | 2.741μs       |
+    | HasBench                                                    | benchHasAbstractFactory             | 0.94x  | 0.815μs      | 0.766μs       |
+    | HasBench                                                    | benchHasFactory1                    | 0.94x  | 0.510μs      | 0.479μs       |
+    | FetchNewServicesBench                                       | benchFetchDelegator                 | 0.92x  | 6.167μs      | 5.702μs       |
+    | FetchNewServicesBench                                       | benchBuildDelegator                 | 0.90x  | 5.733μs      | 5.163μs       |
+    | HasBench                                                    | benchHasService1                    | 0.88x  | 0.482μs      | 0.423μs       |
+    +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
+
+#### By benchmark
+
+    +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
+    | benchmark                                                   | subject                             | diff   | tag:mxc:mean | tag:zend:mean |
+    +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
+    | FetchCachedServicesBench                                    | benchFetchFactory1                  | 0.96x  | 0.416μs      | 0.398μs       |
+    | FetchCachedServicesBench                                    | benchFetchInvokable1                | 0.99x  | 0.413μs      | 0.408μs       |
+    | FetchCachedServicesBench                                    | benchFetchService1                  | 0.98x  | 0.412μs      | 0.405μs       |
+    | FetchCachedServicesBench                                    | benchFetchAlias1                    | 0.98x  | 0.406μs      | 0.397μs       |
+    | FetchCachedServicesBench                                    | benchFetchRecursiveAlias1           | 0.96x  | 0.415μs      | 0.400μs       |
+    | FetchCachedServicesBench                                    | benchFetchRecursiveAlias2           | 0.98x  | 0.407μs      | 0.399μs       |
+    | FetchCachedServicesBench                                    | benchFetchAbstractFactoryService    | 0.97x  | 0.412μs      | 0.399μs       |
+    | FetchCachedServicesBench                                    | benchFetchMultiDelegatorService     | 0.96x  | 0.412μs      | 0.397μs       |
+    | FetchCachedServicesBench                                    | benchFetchDelegatorService          | 1.01x  | 0.415μs      | 0.420μs       |
+    | FetchCachedServicesBench                                    | benchFetchLazyService               | 0.97x  | 0.410μs      | 0.398μs       |
+    | FetchNewServiceManagerBench                                 | benchFetchServiceManagerCreation    | 4.09x  | 228.723μs    | 935.954μs     |
+    | FetchNewServicesBench                                       | benchFetchFactory1                  | 1.12x  | 2.513μs      | 2.806μs       |
+    | FetchNewServicesBench                                       | benchBuildFactory1                  | 1.14x  | 2.103μs      | 2.391μs       |
+    | FetchNewServicesBench                                       | benchFetchInvokable1                | 1.65x  | 2.022μs      | 3.338μs       |
+    | FetchNewServicesBench                                       | benchBuildInvokable1                | 1.58x  | 1.669μs      | 2.641μs       |
+    | FetchNewServicesBench                                       | benchFetchService1                  | 0.99x  | 0.401μs      | 0.397μs       |
+    | FetchNewServicesBench                                       | benchFetchFactoryAlias1             | 1.17x  | 2.057μs      | 2.413μs       |
+    | FetchNewServicesBench                                       | benchBuildFactoryAlias1             | 1.17x  | 2.056μs      | 2.407μs       |
+    | FetchNewServicesBench                                       | benchFetchRecursiveFactoryAlias1    | 1.18x  | 2.053μs      | 2.432μs       |
+    | FetchNewServicesBench                                       | benchBuildRecursiveFactoryAlias1    | 1.18x  | 2.058μs      | 2.421μs       |
+    | FetchNewServicesBench                                       | benchFetchRecursiveFactoryAlias2    | 1.18x  | 2.070μs      | 2.434μs       |
+    | FetchNewServicesBench                                       | benchBuildRecursiveFactoryAlias2    | 1.18x  | 2.060μs      | 2.430μs       |
+    | FetchNewServicesBench                                       | benchFetchAbstractFactoryFoo        | 0.99x  | 2.314μs      | 2.301μs       |
+    | FetchNewServicesBench                                       | benchFetchAbstractFactoryFooCached  | 1.00x  | 2.307μs      | 2.309μs       |
+    | FetchNewServicesBench                                       | benchBuildAbstractFactoryFoo        | 1.01x  | 1.842μs      | 1.862μs       |
+    | FetchNewServicesBench                                       | benchFetchMultiDelegator            | 0.97x  | 9.064μs      | 8.810μs       |
+    | FetchNewServicesBench                                       | benchBuildMultiDelegator            | 0.96x  | 8.660μs      | 8.336μs       |
+    | FetchNewServicesBench                                       | benchFetchDelegator                 | 0.92x  | 6.167μs      | 5.702μs       |
+    | FetchNewServicesBench                                       | benchBuildDelegator                 | 0.90x  | 5.733μs      | 5.163μs       |
+    | FetchNewServicesBench                                       | benchFetchLazyService               | 1.00x  | 204.750μs    | 204.562μs     |
+    | FetchNewServicesBench                                       | benchBuildLazyService               | 0.99x  | 203.850μs    | 202.212μs     |
+    | FetchNewServicesBench                                       | benchFetchMultiDelegatorCached      | 1.70x  | 3.872μs      | 6.572μs       |
+    | FetchNewServicesBench                                       | benchBuildMultiDelegatorCached      | 1.75x  | 3.449μs      | 6.053μs       |
+    | FetchNewServicesBench                                       | benchFetchDelegatorCached           | 1.43x  | 3.075μs      | 4.410μs       |
+    | FetchNewServicesBench                                       | benchBuildDelegatorCached           | 1.47x  | 2.627μs      | 3.868μs       |
+    | FetchNewServicesBench                                       | benchFetchLazyServiceCached         | 1.39x  | 4.941μs      | 6.892μs       |
+    | FetchNewServicesBench                                       | benchBuildLazyServiceCached         | 1.32x  | 4.317μs      | 5.709μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchFetchServiceWithNoDependencies | 1.08x  | 4.546μs      | 4.923μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchBuildServiceWithNoDependencies | 1.03x  | 4.326μs      | 4.473μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchFetchServiceDependingOnConfig  | 1.09x  | 5.123μs      | 5.602μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchBuildServiceDependingOnConfig  | 1.05x  | 4.900μs      | 5.133μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchFetchServiceWithDependency     | 1.13x  | 5.107μs      | 5.766μs       |
+    | FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench     | benchBuildServiceWithDependency     | 1.05x  | 4.859μs      | 5.112μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchFetchServiceWithNoDependencies | 1.18x  | 3.261μs      | 3.851μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchBuildServiceWithNoDependencies | 1.09x  | 3.101μs      | 3.382μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchFetchServiceDependingOnConfig  | 1.10x  | 6.429μs      | 7.071μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchBuildServiceDependingOnConfig  | 1.06x  | 6.212μs      | 6.558μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchFetchServiceWithDependency     | 1.08x  | 7.753μs      | 8.406μs       |
+    | FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench | benchBuildServiceWithDependency     | 1.04x  | 7.506μs      | 7.816μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchFetchServiceWithNoDependencies | 1.23x  | 4.340μs      | 5.343μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchBuildServiceWithNoDependencies | 1.22x  | 3.936μs      | 4.800μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchFetchServiceDependingOnConfig  | 1.20x  | 4.996μs      | 5.989μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchBuildServiceDependingOnConfig  | 1.19x  | 4.562μs      | 5.442μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchFetchServiceWithDependency     | 1.20x  | 4.964μs      | 5.958μs       |
+    | FetchNewServiceViaConfigAbstractFactoryBench                | benchBuildServiceWithDependency     | 1.21x  | 4.502μs      | 5.435μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchFetchServiceWithNoDependencies | 1.08x  | 3.048μs      | 3.299μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchBuildServiceWithNoDependencies | 0.95x  | 2.885μs      | 2.741μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchFetchServiceDependingOnConfig  | 1.04x  | 6.462μs      | 6.710μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchBuildServiceDependingOnConfig  | 1.00x  | 6.049μs      | 6.063μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchFetchServiceWithDependency     | 1.04x  | 7.638μs      | 7.955μs       |
+    | FetchNewServiceViaReflectionAbstractFactoryBench            | benchBuildServiceWithDependency     | 1.00x  | 7.379μs      | 7.378μs       |
+    | HasBench                                                    | benchHasFactory1                    | 0.94x  | 0.510μs      | 0.479μs       |
+    | HasBench                                                    | benchHasInvokable1                  | 1.02x  | 0.526μs      | 0.537μs       |
+    | HasBench                                                    | benchHasService1                    | 0.88x  | 0.482μs      | 0.423μs       |
+    | HasBench                                                    | benchHasAlias1                      | 1.05x  | 0.502μs      | 0.527μs       |
+    | HasBench                                                    | benchHasRecursiveAlias1             | 1.07x  | 0.499μs      | 0.534μs       |
+    | HasBench                                                    | benchHasRecursiveAlias2             | 1.08x  | 0.493μs      | 0.534μs       |
+    | HasBench                                                    | benchHasAbstractFactory             | 0.94x  | 0.815μs      | 0.766μs       |
+    | HasBench                                                    | benchHasNot                         | 0.95x  | 0.856μs      | 0.814μs       |
+    | SetNewServicesBench                                         | benchSetService                     | 3.30x  | 0.596μs      | 1.968μs       |
+    | SetNewServicesBench                                         | benchSetFactory                     | 3.79x  | 1.136μs      | 4.304μs       |
+    | SetNewServicesBench                                         | benchSetAlias                       | 9.66x  | 1.949μs      | 18.828μs      |
+    | SetNewServicesBench                                         | benchOverrideAlias                  | 33.34x | 1.949μs      | 64.965μs      |
+    | SetNewServicesBench                                         | benchSetInvokableClass              | 4.34x  | 1.224μs      | 5.311μs       |
+    | SetNewServicesBench                                         | benchAddDelegator                   | 1.44x  | 2.398μs      | 3.444μs       |
+    | SetNewServicesBench                                         | benchAddMultiDelegator              | 1.53x  | 2.252μs      | 3.447μs       |
+    | SetNewServicesBench                                         | benchAddInitializerByClassName      | 1.62x  | 1.438μs      | 2.327μs       |
+    | SetNewServicesBench                                         | benchAddInitializerByInstance       | 2.01x  | 0.829μs      | 1.668μs       |
+    | SetNewServicesBench                                         | benchAddAbstractFactoryByClassName  | 4.09x  | 0.808μs      | 3.304μs       |
+    | SetNewServicesBench                                         | benchAddAbstractFactoryByInstance   | 1.65x  | 1.691μs      | 2.794μs       |
+    +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
+
 ## Version 0.4.0 - 2018-02-20: ConfigAbstractFactory
 
-## Added
+### Added
 
 - nothing
 
-## Fixed
+### Fixed
 
 - nothing
 
-## Changed
+### Changed
 
 - Caching of configuration in ConfigAbstractFactory. Configuration can be assumed to be unchanged between calls,
   also this is not documented. If configuration would be allowed to be changed between calls, abstract factories could not grant,
   that they can produce services which they report to be able to produce via canCreate.
 
-## Deprecated
+### Deprecated
 
 - nothing
 
-## Benchmark comparison
+### Benchmark comparison
 
 Here is a new full benchmark comparison. The diff column says, how much time zend-servicemanager needs compared to mxc-servicemanager. For example: The first line of the report below
 says: zend-servicemanager needs 2,99x the time mxc-servicemanager needs to complete the benchFetchServiceManagerCreation test which can be found in FetchNewServiceManagerBench.php.
@@ -103,26 +286,26 @@ Tests, where mxc-servicemanager is slower than zend-servicemanager are marked wi
 
 ## Version 0.3.1 - 2018-02-19
 
-## Added
+### Added
 
 - nothing
 
-## Fixed
+### Fixed
 
 - Added test and fixed that service manager accepted factories not implementing FactoryInterface
 - Added test and fixed that service manager accepted initializers not implementing InitializerInterface
 - Added test and fixed that service manager accepted delegator factories not implementing DelegatorFactoryInterface
 
-## Changed
+### Changed
 
 - Standardized exception used for invalid service manager configuration to InvalidArgumentException.
 - ServiceNotCreatedException now gets only thrown, if an external exception was caught.
 
-## Deprecated
+### Deprecated
 
 - nothing
 
-## Benchmark comparison
+### Benchmark comparison
 
 See 0.2.0 below.
 

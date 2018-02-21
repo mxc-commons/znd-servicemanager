@@ -600,7 +600,8 @@ class ServiceManager implements ServiceLocatorInterface
             }
             throw InvalidArgumentException::fromInvalidDelegatorFactoryInstance($delegatorFactory);
         }
-        // cache the callback for later requests
+
+        //cache the callback for later requests
         $this->delegatorCallbackCache[$name] = $creationCallback;
         return $creationCallback($this->creationContext, $name, $creationCallback, $options);
     }
@@ -769,15 +770,23 @@ class ServiceManager implements ServiceLocatorInterface
      * Add a delegator for a given service.
      *
      * @param string $name Service name
-     * @param string|callable|Factory\DelegatorFactoryInterface $factory Delegator
-     *     factory to assign.
+     * @param (string|callable|Factory\DelegatorFactoryInterface[]) $factory
+     *     Delegator factory (array) to assign
      */
     public function addDelegator($name, $factory)
     {
         if (isset($this->services[$name]) && ! $this->allowOverride) {
             throw ContainerModificationsNotAllowedException::fromExistingService($name);
         }
-        $this->delegators = array_merge_recursive($this->delegators, [$name => [$factory]]);
+        $factory = is_array($factory) ? $factory : [ $factory];
+        if (is_array($this->delegators[$name])) {
+            $this->delegators[$name] = array_merge(
+                $this->delegators[$name],
+                $factory
+            );
+        } else {
+            $this->delegators[$name] = $factory;
+        }
     }
 
     /**

@@ -12,6 +12,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Revs;
 use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 use Zend\ServiceManager\ServiceManager;
 use ZendBench\ServiceManager\BenchAsset\DelegatorFactoryFoo;
+use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
 
 /**
  * @Revs(100000)
@@ -108,7 +109,23 @@ class SetNewServicesBench
     public function benchAddDelegator()
     {
         $sm = clone $this->sm;
-        $sm->addDelegator(BenchAsset\Foo::class, DelegatorFactoryFoo::class);
+        $sm->addDelegator(BenchAsset\Foo::class, DelegatorFactory::class);
+    }
+
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
+    public function benchAddMultiDelegator()
+    {
+        $sm = clone $this->sm;
+        $sm->addDelegator(
+            BenchAsset\Foo::class,
+            [
+                DelegatorFactory::class,
+                DelegatorFactory::class,
+                DelegatorFactory::class,
+            ]
+        );
     }
 
     /**

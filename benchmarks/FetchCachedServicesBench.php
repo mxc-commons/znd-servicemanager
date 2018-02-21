@@ -44,16 +44,16 @@ class FetchCachedServicesBench
             'abstract_factories' => [
                 BenchAsset\AbstractFactoryFoo::class
             ],
-            'cache_abstract_factories_on_startup' => true,
         ]);
 
-        // forcing initialization of all the services
+        // force caching of all services
         $this->sm->get('factory1');
         $this->sm->get('invokable1');
         $this->sm->get('service1');
         $this->sm->get('alias1');
         $this->sm->get('recursiveAlias1');
         $this->sm->get('recursiveAlias2');
+        $this->sm->get('foo');
     }
 
     public function benchFetchFactory1()

@@ -45,7 +45,6 @@ class FetchNewServicesBench
             'abstract_factories' => [
                 BenchAsset\AbstractFactoryFoo::class,
             ],
-            'cache_abstract_factories_on_startup' => true,
         ]);
         $this->sm2 = clone $this->sm;
         $this->sm2->build('foo');

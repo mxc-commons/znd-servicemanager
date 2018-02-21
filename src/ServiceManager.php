@@ -21,7 +21,10 @@ use Zend\ServiceManager\Exception\CyclicAliasException;
 use Zend\ServiceManager\Exception\InvalidArgumentException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Zend\ServiceManager\Initializer\InitializerInterface;
 
 use function array_merge_recursive;
 use function class_exists;
@@ -31,9 +34,6 @@ use function is_string;
 use function spl_autoload_register;
 use function spl_object_hash;
 use function trigger_error;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Zend\ServiceManager\Initializer\InitializerInterface;
-use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**
  * Service Manager.
@@ -665,32 +665,6 @@ class ServiceManager implements ServiceLocatorInterface
             } else {
                 throw InvalidArgumentException::fromInvalidInitializer($initializer);
             }
-        }
-    }
-
-    /**
-     * Applies initializers to a supplied object
-     *
-     * Initializers are instantiated and cached for later use as necessary
-     *
-     * @param object
-     */
-    private function applyInitializers($object)
-    {
-        foreach ($this->initializers as $idx => $initializer) {
-            if (is_string($initializer) && class_exists($initializer)) {
-                $initializer = new $initializer();
-                if (! $initializer instanceof InitializerInterface) {
-                    throw InvalidArgumentException::fromInvalidInitializer($initializer);
-                }
-            }
-
-            if (is_callable($initializer)) {
-                $this->initializers[$idx] = $initializer;
-                $initializer($this->creationContext, $object);
-                continue;
-            }
-            throw InvalidArgumentException::fromInvalidInitializer($initializer);
         }
     }
 

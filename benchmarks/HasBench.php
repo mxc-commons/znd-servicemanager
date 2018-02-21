@@ -44,7 +44,6 @@ class HasBench
             'abstract_factories' => [
                 BenchAsset\AbstractFactoryFoo::class
             ],
-            'cache_abstract_factories_on_startup' => true,
         ]);
     }
 

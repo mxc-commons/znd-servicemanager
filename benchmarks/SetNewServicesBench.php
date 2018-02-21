@@ -1,7 +1,8 @@
 <?php
 /**
- * @link      http://github.com/zendframework/zend-servicemanager for the canonical source repository
+ * @link      https://github.com/mxc-commobs/mxc-servicemanager for the canonical source repository
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2018 maxence operations gmbh, Germany
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11,7 +12,6 @@ use PhpBench\Benchmark\Metadata\Annotations\Iterations;
 use PhpBench\Benchmark\Metadata\Annotations\Revs;
 use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 use Zend\ServiceManager\ServiceManager;
-use ZendBench\ServiceManager\BenchAsset\DelegatorFactoryFoo;
 use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
 
 /**
@@ -52,7 +52,7 @@ class SetNewServicesBench
             $config['aliases']["alias_$i"]     = "service_$i";
             $config['abstract_factories'][] = BenchAsset\AbstractFactoryFoo::class;
             $config['invokables']["invokable_$i"] = BenchAsset\Foo::class;
-            $config['delegators']["delegator_$i"] = [ DelegatorFactoryFoo::class ];
+            $config['delegators']["delegator_$i"] = [ DelegatorFactory::class ];
         }
 
         $this->initializer = new BenchAsset\InitializerFoo();

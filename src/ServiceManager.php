@@ -366,23 +366,22 @@ class ServiceManager implements ServiceLocatorInterface
             return $this->services[$name];
         }
 
-        // Determine if the service should be shared.
-        $sharedService = isset($this->shared[$name]) ? $this->shared[$name] : $this->sharedByDefault;
-
         // We achieve better performance if we can let all alias
         // considerations out.
         if (! $this->aliases) {
             $object = $this->createService($name, null);
 
             // Cache the object for later, if it is supposed to be shared.
-            if ($sharedService) {
+            if (isset($this->shared[$name]) ? $this->shared[$name] : $this->sharedByDefault) {
                 $this->services[$name] = $object;
             }
             return $object;
         }
 
+        $sharedService = isset($this->shared[$name]) ? $this->shared[$name] : $this->sharedByDefault;
+
         // We now deal with requests which may be aliases.
-        $resolvedName = isset($this->aliases[$name]) ? $this->aliases[$name] : $name;
+        $resolvedName = $this->aliases[$name] ?? $name;
 
         // The following is only true if the requested service is a shared alias.
         $sharedAlias = $sharedService && isset($this->services[$resolvedName]);
@@ -426,15 +425,23 @@ class ServiceManager implements ServiceLocatorInterface
      */
     public function has($name)
     {
-        $resolvedName = $this->aliases[$name] ?? $name;
-        if (isset($this->services[$resolvedName])
-            || isset($this->factories[$resolvedName])
-            || isset($this->invokables[$resolvedName])) {
+        if (isset($this->services[$name])) {
             return true;
         }
-
+        if (isset($this->aliases[$name])) {
+            $name = $this->aliases[$name];
+        }
+        if (isset($this->services[$name])) {
+            return true;
+        }
+        if (isset($this->factories[$name])) {
+            return true;
+        }
+        if (isset($this->invokables[$name])) {
+            return true;
+        }
         foreach ($this->abstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($this->creationContext, $resolvedName)) {
+            if ($abstractFactory->canCreate($this->creationContext, $name)) {
                 return true;
             }
         }

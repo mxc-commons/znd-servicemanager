@@ -10,7 +10,71 @@ We provide two benchmark comparison, one sorted by benchmark, one sorted descend
 The benchmark comparisonsare based on a patched version of PHPBench 0.15-dev. The patch adds the `diff` column and sorts descendig by this
 column. All tests were done with PHPBench 0.15-dev. The benchmark suite used was backported to zend:master.
 
-#### By performance gain factor
+This version is not in all aspects faster than zend-servicemanager.
+
+#### Rationale of some functions being slightly slower in mxc-servicemanager
+
+* Benchmark: FetchNewServicesBench, Subject: benchFetchAbstractFactoryFoo ( 0.99x, mxc: 2.314μs, zend: 2.301μs)
+No explanation available (glitch?).
+
+* Benchmark: FetchNewServicesBench, Subject: benchBuildLazyService ( 0.99x, mxc: 203.850μs, zend: 202.212μs)
+No explanation available (glitch?).
+
+* Benchmark: FetchNewServicesBench, Subject: benchFetchService1 (0.99x, mxc: 0.401μs, zend: 0.397μs)
+No explanation available (glitch?)
+
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchInvokable1 (0.99x, mxc: 0.413μs, zend: 0.408μs)
+No explanation available (glitch?)
+
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchService1 (0.98x, mxc: 0.412μs, zend: 0.405μs)
+No explanation available (glitch?)
+
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchRecursiveAlias2 (0.98x, mxc: 0.407μs, zend: 0.399μs)
+No explanation available (glitch?)
+
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchAlias1 (0.98x, mxc: 0.406μs, zend: 0.397μs)
+No explanation available (glitch?)
+
+* Benchmark: FetchNewServicesBench, Subject: benchFetchMultiDelegator (0.97x, mxc:  9.064μs, zend: 8.810μs)
+mxc-servicemanager implements caching of the creation callback produced `createServiceFromDelegator`. The difference
+is caused by the administration overhead for that cache. Utilizing this cache servicemanager can much faster
+reproduce a delegator (see benchFetchMultiDelegatorCached (1.70x, mxc: 3.872μs, zend: 6.572μs)).
+
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchLazyService (0.97x, mxc: 0.410μs, zend: 0.398μs)
+No explanation available (glitch?)
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchAbstractFactoryService (0.97x, mxc: 0.412μs, zend: 0.399μs)
+No explanation available (glitch?)
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchRecursiveAlias1 (0.96x, mxc: 0.415μs, zend: 0.400μs)
+No explanation available (glitch?)
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchMultiDelegatorService (0.96x, mxc: 0.412μs, zend: 0.397μs)
+No explanation available (glitch?)
+* Benchmark: FetchNewServicesBench, Subject: benchBuildMultiDelegator (0.96x, mxc: 8.660μs, zend: 8.336μs)
+mxc-servicemanager implements caching of the creation callback produced `createServiceFromDelegator`. The difference
+is caused by the administration overhead for that cache. Utilizing this cache servicemanager can much faster
+reproduce a delegator (see benchBuildMultiDelegatorCached (1.75x, mxc: 3.449μs, zend: 6.053μs).
+
+* Benchmark: FetchCachedServicesBench, Subject: benchFetchFactory1 (0.96x, mxc: 0.416μs, zend: 0.398μs)
+No explanation available (glitch?)
+* Benchmark: HasBench, Subject: benchHasNot (0.95x, mxc: 0.856μs, zend: 0.814μs)
+has() is slightly slower because it has to check factories, services and (new) invokables before testing abstract factories
+* Benchmark: FetchNewServiceViaReflectionAbstractFactoryBench, Subject: benchBuildServiceWithNoDependencies (0.95x, mxc: 2.885μs, zend: 2.741μs)
+No explanation available, but can be reproduced.
+* Benchmark: HasBench, Subject: benchHasAbstractFactory (0.94x, mxc: 0.815μs, zend: 0.766μs)
+has() is slightly slower because it has to check factories, services and (new) invokables before testing abstract factories
+* Benchmark: HasBench, Subject: benchHasFactory1 (0.94x, mxc: 0.510μs, zend: 0.479μs)
+has() is slightly slower because it has to check factories, services and (new) invokables before testing abstract factories
+* Benchmark: FetchNewServicesBench, Subject: benchFetchDelegator (0.92x, mxc: 6.167μs, zend: 5.702μs)
+mxc-servicemanager implements caching of the creation callback produced `createServiceFromDelegator`. The difference
+is caused by the administration overhead for that cache. Utilizing this cache servicemanager can much faster
+reproduce a delegator (see benchFetchDelegatorCached (1.43x, mxc: 3.075μs, zend: 4.410μs).
+* Benchmark: FetchNewServicesBench, Subject: benchBuildDelegator (0.90x, mxc: 5.733μs, zend: 5.163μs)
+mxc-servicemanager implements caching of the creation callback produced `createServiceFromDelegator`. The difference
+is caused by the administration overhead for that cache. Utilizing this cache servicemanager can much faster
+reproduce a delegator (see benchBuildDelegatorCached (1.47x, mxc: 2.627μs, zend: 3.868μs).
+* Benchmark: HasBench, Subject: benchHasService1 (0.88x, mxc: 0.482μs, zend: 0.423μs)
+
+
+#### Benchmark comparison zend-master vs mxc-master:  By performance gain factor
 
     $ vendor\bin\phpbench report --file=..\all.050.xml --file=..\all.zend.xml --report="extends: compare, compare: tag, cols: ["benchmark", "subject"]
     +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
@@ -98,7 +162,7 @@ column. All tests were done with PHPBench 0.15-dev. The benchmark suite used was
     | HasBench                                                    | benchHasService1                    | 0.88x  | 0.482μs      | 0.423μs       |
     +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
 
-#### By benchmark
+#### Benchmark comparison zend-master vs mxc-master:  By benchmark
 
     +-------------------------------------------------------------+-------------------------------------+--------+--------------+---------------+
     | benchmark                                                   | subject                             | diff   | tag:mxc:mean | tag:zend:mean |

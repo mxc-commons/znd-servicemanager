@@ -773,7 +773,7 @@ class ServiceManager implements ServiceLocatorInterface
     }
 
     /**
-     * Add a delegator for a given service.
+     * Add a delegator or an array of delegators for a given service.
      *
      * @param string $name Service name
      * @param (string|callable|Factory\DelegatorFactoryInterface[]) $factory

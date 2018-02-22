@@ -20,7 +20,7 @@ use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
  * @OutputTimeUnit("milliseconds", precision=3)
  * @Warmup(2)
  */
-class UsageBench
+class Usage1000Bench
 {
     const NUM_SERVICES = 1000;
 
@@ -28,6 +28,7 @@ class UsageBench
      * @var array
      */
     private $sm;
+    private $config;
 
     public function __construct()
     {
@@ -56,6 +57,7 @@ class UsageBench
         }
 
         $this->sm = new ServiceManager($config);
+        $this->config = $config;
 
         $this->sm2 = clone $this->sm;
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
@@ -86,7 +88,7 @@ class UsageBench
         $sm = clone $this->sm;
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-//             $sm->build("service_$i");
+            $sm->get("service_$i");
             $sm->build("alias_$i");
             $sm->build("factory_$i");
             $sm->build("invokable_$i");
@@ -101,7 +103,7 @@ class UsageBench
         $sm = clone $this->sm2;
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-//             $sm->build("service_$i");
+            $sm->get("service_$i");
             $sm->build("alias_$i");
             $sm->build("factory_$i");
             $sm->build("invokable_$i");
@@ -116,8 +118,56 @@ class UsageBench
         $sm = clone $this->sm3;
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-//             $sm->build("service_$i");
-//             $sm->build("alias_$i");
+            $sm->get("service_$i");
+            $sm->build("alias_$i");
+            $sm->build("factory_$i");
+            $sm->build("invokable_$i");
+        }
+        for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
+            $sm->build("factory_$i");
+        }
+    }
+
+    public function benchFullCycleFetchEachServiceOnce()
+    {
+        $sm = clone $this->sm;
+        $discard = new ServiceManager($this->config);
+
+        for ($i = 0; $i < self::NUM_SERVICES; $i++) {
+            $sm->get("service_$i");
+            $sm->build("alias_$i");
+            $sm->build("factory_$i");
+            $sm->build("invokable_$i");
+        }
+        for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
+            $sm->build("factory_$i");
+        }
+    }
+
+    public function benchFullCycleFetchEachServiceTwice()
+    {
+        $sm = clone $this->sm2;
+        $discard = new ServiceManager($this->config);
+
+        for ($i = 0; $i < self::NUM_SERVICES; $i++) {
+            $sm->get("service_$i");
+            $sm->build("alias_$i");
+            $sm->build("factory_$i");
+            $sm->build("invokable_$i");
+        }
+        for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
+            $sm->build("factory_$i");
+        }
+    }
+
+    public function benchFullCycleFetchEachServiceThreeTimes()
+    {
+        $sm = clone $this->sm3;
+        $discard = new ServiceManager($this->config);
+
+        for ($i = 0; $i < self::NUM_SERVICES; $i++) {
+            $sm->get("service_$i");
+            $sm->build("alias_$i");
             $sm->build("factory_$i");
             $sm->build("invokable_$i");
         }

@@ -785,11 +785,8 @@ class ServiceManager implements ServiceLocatorInterface
             throw ContainerModificationsNotAllowedException::fromExistingService($name);
         }
         $factory = is_array($factory) ? $factory : [ $factory];
-        if (is_array($this->delegators[$name])) {
-            $this->delegators[$name] = array_merge(
-                $this->delegators[$name],
-                $factory
-            );
+        if (isset($this->delegators[$name])) {
+            $this->delegators[$name] = $factory + $this->delegators[$name];
         } else {
             $this->delegators[$name] = $factory;
         }

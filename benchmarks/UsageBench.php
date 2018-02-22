@@ -46,7 +46,7 @@ class UsageBench
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
             $config['services']["service_$i"]     = $service;
-            $config['aliases']["alias_$i"]        = "service_$i";
+            $config['aliases']["alias_$i"]        = "factory_$i";
             $config['factories']["factory_$i"]    = BenchAsset\FactoryFoo::class;
             $config['invokables']["invokable_$i"] = BenchAsset\Foo::class;
         }
@@ -54,27 +54,29 @@ class UsageBench
              $config['factories']["factory_$i"]    = BenchAsset\FactoryFoo::class;
              $config['delegators']["factory_$i"]   = [ DelegatorFactory::class, DelegatorFactory::class];
         }
+
         $this->sm = new ServiceManager($config);
+
         $this->sm2 = clone $this->sm;
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
             $this->sm2->get("service_$i");
-            $this->sm2->get("alias_$i");
-            $this->sm2->get("factory_$i");
-            $this->sm2->get("invokable_$i");
+            $this->sm2->build("alias_$i");
+            $this->sm2->build("factory_$i");
+            $this->sm2->build("invokable_$i");
         }
         for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES + self::NUM_SERVICES; $i++) {
-            $this->sm2->get("factory_$i");
+            $this->sm2->build("factory_$i");
         }
         $this->sm3 = clone $this->sm2;
         for ($k = 1; $k < 3; $k++) {
             for ($i = 0; $i < self::NUM_SERVICES; $i++) {
                 $this->sm3->get("service_$i");
-                $this->sm3->get("alias_$i");
-                $this->sm3->get("factory_$i");
-                $this->sm3->get("invokable_$i");
+                $this->sm3->build("alias_$i");
+                $this->sm3->build("factory_$i");
+                $this->sm3->build("invokable_$i");
             }
             for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES + self::NUM_SERVICES; $i++) {
-                $this->sm3->get("factory_$i");
+                $this->sm3->build("factory_$i");
             }
         }
     }
@@ -84,13 +86,13 @@ class UsageBench
         $sm = clone $this->sm;
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-            $sm->get("service_$i");
-            $sm->get("alias_$i");
-            $sm->get("factory_$i");
-            $sm->get("invokable_$i");
+//             $sm->build("service_$i");
+            $sm->build("alias_$i");
+            $sm->build("factory_$i");
+            $sm->build("invokable_$i");
         }
         for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
-            $sm->get("factory_$i");
+            $sm->build("factory_$i");
         }
     }
 
@@ -99,13 +101,13 @@ class UsageBench
         $sm = clone $this->sm2;
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-            $sm->get("service_$i");
-            $sm->get("alias_$i");
-            $sm->get("factory_$i");
-            $sm->get("invokable_$i");
+//             $sm->build("service_$i");
+            $sm->build("alias_$i");
+            $sm->build("factory_$i");
+            $sm->build("invokable_$i");
         }
         for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
-            $sm->get("factory_$i");
+            $sm->build("factory_$i");
         }
     }
 
@@ -114,13 +116,13 @@ class UsageBench
         $sm = clone $this->sm3;
 
         for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-            $sm->get("service_$i");
-            $sm->get("alias_$i");
-            $sm->get("factory_$i");
-            $sm->get("invokable_$i");
+//             $sm->build("service_$i");
+//             $sm->build("alias_$i");
+            $sm->build("factory_$i");
+            $sm->build("invokable_$i");
         }
         for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
-            $sm->get("factory_$i");
+            $sm->build("factory_$i");
         }
     }
 }

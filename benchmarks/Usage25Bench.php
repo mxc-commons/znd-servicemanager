@@ -83,7 +83,11 @@ class Usage25Bench
         }
     }
 
-    public function fetchNewServiceManager()
+    /**
+     * @OutputTimeUnit("microseconds", precision=3)
+     * @Revs(500)
+     */
+    public function benchFetchNewServiceManager()
     {
         $sm = new ServiceManager($this->config);
     }
@@ -133,51 +137,20 @@ class Usage25Bench
         }
     }
 
-    public function benchFullCycleFetchEachServiceOnce()
+    public function benchFullCycle()
     {
-        $sm = clone $this->sm;
-        $discard = new ServiceManager($this->config);
+        $sm = new ServiceManager($this->config);
 
-        for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-            $sm->get("service_$i");
-            $sm->build("alias_$i");
-            $sm->build("factory_$i");
-            $sm->build("invokable_$i");
-        }
-        for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
-            $sm->build("factory_$i");
-        }
-    }
-
-    public function benchFullCycleFetchEachServiceTwice()
-    {
-        $sm = clone $this->sm2;
-        $discard = new ServiceManager($this->config);
-
-        for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-            $sm->get("service_$i");
-            $sm->build("alias_$i");
-            $sm->build("factory_$i");
-            $sm->build("invokable_$i");
-        }
-        for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
-            $sm->build("factory_$i");
-        }
-    }
-
-    public function benchFullCycleFetchEachServiceThreeTimes()
-    {
-        $sm = clone $this->sm3;
-        $discard = new ServiceManager($this->config);
-
-        for ($i = 0; $i < self::NUM_SERVICES; $i++) {
-            $sm->get("service_$i");
-            $sm->build("alias_$i");
-            $sm->build("factory_$i");
-            $sm->build("invokable_$i");
-        }
-        for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
-            $sm->build("factory_$i");
+        for ($cycle = 0; $cycle < 3; $cycle++) {
+            for ($i = 0; $i < self::NUM_SERVICES; $i++) {
+                $sm->get("service_$i");
+                $sm->build("alias_$i");
+                $sm->build("factory_$i");
+                $sm->build("invokable_$i");
+            }
+            for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
+                $sm->build("factory_$i");
+            }
         }
     }
 }

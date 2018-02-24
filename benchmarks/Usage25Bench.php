@@ -83,6 +83,11 @@ class Usage25Bench
         }
     }
 
+    public function fetchNewServiceManager()
+    {
+        $sm = new ServiceManager($this->config);
+    }
+
     public function benchFetchEachServiceOnce()
     {
         $sm = clone $this->sm;

@@ -866,7 +866,7 @@ trait CommonServiceLocatorBehaviorsTrait
     }
 
     /**
-     * @covers \Zend\ServiceManager\Exception\InvalidArgunmentException::fromInvalidFactory
+     * @covers \Zend\ServiceManager\Exception\InvalidArgumentException::fromInvalidFactory
      */
     public function testThrowOnFactoriesNotImplementingFactoryInterface()
     {

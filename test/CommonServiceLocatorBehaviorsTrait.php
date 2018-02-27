@@ -865,6 +865,9 @@ trait CommonServiceLocatorBehaviorsTrait
         $sm->setAlias('alias', 'alias');
     }
 
+    /**
+     * @covers \Zend\ServiceManager\Exception\InvalidArgunmentException::fromInvalidFactory
+     */
     public function testThrowOnFactoriesNotImplementingFactoryInterface()
     {
         $sm = $this->createContainer([

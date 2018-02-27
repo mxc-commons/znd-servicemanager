@@ -922,6 +922,9 @@ trait CommonServiceLocatorBehaviorsTrait
         self::assertSame($sm->get(stdClass::class), $sm->get('alias1'));
     }
 
+    /**
+     * @covers \Zend\ServiceManager\ServiceManager::configure
+     */
     public function testCoverageApplyConfigurationTwice()
     {
         $config = [
@@ -934,8 +937,8 @@ trait CommonServiceLocatorBehaviorsTrait
                 'lazy_service' => SampleFactory::class,
             ],
             'delegators' => [
-                'delegator' => PassthroughDelegatorFactory::class,
-                'lazy_service' => LazyServiceFactory::class,
+                'delegator' => [ PassthroughDelegatorFactory::class ],
+                'lazy_service' => [ LazyServiceFactory::class ],
             ],
             'invokables' => [
                 'invokable' => stdClass::class,
@@ -969,8 +972,23 @@ trait CommonServiceLocatorBehaviorsTrait
         );
         self::assertAttributeSame($config['lazy_services']['class_map'], 'lazyServicesClassMap', $sm);
 
-        // intended behaviour unclear for this one
+        //intended behaviour unclear for this one
         // self::assertAttributeSame($config['delegators'], 'delegators', $sm);
+    }
+
+    public function testDelegatorCallbackGetsCached()
+    {
+        $sm = $this->createContainer([
+            'factories' => [
+                'delegator' => SampleFactory::class,
+            ],
+            'delegators' => [
+                'delegator' => [ PassthroughDelegatorFactory::class ],
+            ],
+        ]);
+
+        $delegator = $sm->get('delegator');
+        self::assertInstanceOf(InvokableObject::class, $delegator);
     }
 
     /**

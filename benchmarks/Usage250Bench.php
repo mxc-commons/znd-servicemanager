@@ -137,7 +137,7 @@ class Usage250Bench
         }
     }
 
-    public function benchFullCycle()
+    public function benchFullCycleBuild()
     {
         $sm = new ServiceManager($this->config);
 
@@ -150,6 +150,23 @@ class Usage250Bench
             }
             for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
                 $sm->build("factory_$i");
+            }
+        }
+    }
+
+    public function benchFullCycleGet()
+    {
+        $sm = new ServiceManager($this->config);
+
+        for ($cycle = 0; $cycle < 3; $cycle++) {
+            for ($i = 0; $i < self::NUM_SERVICES; $i++) {
+                $sm->get("service_$i");
+                $sm->get("alias_$i");
+                $sm->get("factory_$i");
+                $sm->get("invokable_$i");
+            }
+            for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
+                $sm->get("factory_$i");
             }
         }
     }

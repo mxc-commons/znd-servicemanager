@@ -50,15 +50,7 @@ We provide a permanent fork, because we do not want to provide a fast service ma
     * ConfigAbstractFactory (done)
     * ReflectionAbstractFactory (todo)
 
-Goal of our activities is to exploit PHP capabilities as far as possible for performance enhancements without giving up on backwards compatibility to
-zend-servicemanager 3.3.2 (currently). We are working on optimizing the PHP implementation in order to find out what the particular requirements for
-maximum speed actually are. Another thing we want to learn about is how to streamline service manager configuration in order to ease comprehension and
-effectivity.
-
-Based on what we learn we plan to provide a PHP core component or extension library implemented in C, which will combine the functionality and
-compatibility of the PHP implementation with the performance of a C implementation. Work on that will not start before 07-2018. Please do not expect stable or even visible results early.
-
-Please refer to the "State of Progress" and "Benchmark Comparison" sections at the end of this file for details on our current achievements towards the goals.
+Please refer to the "State of Progress" and "Benchmark Comparison" sections at the end of this file for status details.
 
 ## Installation
 

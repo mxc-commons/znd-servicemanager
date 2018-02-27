@@ -117,7 +117,7 @@ each version.
 ## What's next?
 
 1. Speed up ReflectionAbstractFactory
-2. Provide an alternative implementation for lazy services. Ocramius's proxy-manager looks somewhat overengineered and too expensive for service manager purposes. See benchmark section.
+2. Provide an alternative implementation for lazy services. Ocramius's proxy-manager pobably is somewhat overengineered and seems to be too expensive for service manager purposes. See benchmark section.
 3. Complete benchmark suite
 4. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
 5. Start x1-master and x1-develop branch. After ReflectionAbstractFactory will be refactored, there seem to be no more options for further performance improvements without bc breaks. x1 will drop the bc requirement and will offer further enhancements together with migration intstructions and tools.

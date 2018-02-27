@@ -87,8 +87,7 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      *
      * @var string[]
      */
-    protected $aliases = [];
-    private $parameters = null;
+    protected $aliases;
 
     /**
      * Constructor.
@@ -101,9 +100,7 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      */
     public function __construct(array $aliases = [])
     {
-        if (! empty($aliases)) {
-            $this->aliases = $aliases;
-        }
+        $this->aliases = $aliases;
     }
 
     /**
@@ -113,32 +110,24 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        if ($this->parameters === null) {
-            $reflectionClass = new ReflectionClass($requestedName);
+        $reflectionClass = new ReflectionClass($requestedName);
 
-            if (null === ($constructor = $reflectionClass->getConstructor())) {
-                $this->parameters = true;
-                return new $requestedName();
-            }
-
-            $reflectionParameters = $constructor->getParameters();
-
-            if (empty($reflectionParameters)) {
-                $this->parameters = true;
-                return new $requestedName();
-            }
-
-            $resolver = $container->has('config')
-                ? $this->resolveParameterWithConfigService($container, $requestedName)
-                : $this->resolveParameterWithoutConfigService($container, $requestedName);
-
-            $this->parameters = array_map($resolver, $reflectionParameters);
-
-            return new $requestedName(...$this->parameters);
-        } elseif ($this->parameters === true) {
+        if (null === ($constructor = $reflectionClass->getConstructor())) {
             return new $requestedName();
         }
-        return new $requestedName(...$this->requestedName);
+
+        $reflectionParameters = $constructor->getParameters();
+
+        if (empty($reflectionParameters)) {
+            return new $requestedName();
+        }
+
+        $resolver = $container->has('config')
+            ? $this->resolveParameterWithConfigService($container, $requestedName)
+            : $this->resolveParameterWithoutConfigService($container, $requestedName);
+
+
+        return new $requestedName(...array_map($resolver, $reflectionParameters));
     }
 
     /**

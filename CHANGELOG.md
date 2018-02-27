@@ -159,14 +159,20 @@ All benchmarks were run with 50 iterations and a retry_threshold of 2 to ensure 
     | FetchNewServicesBench                                       | benchFetchDelegator                 | 100000 | 0.90x  | 5.973µs       | 6.633µs      | *
     +-------------------------------------------------------------+-------------------------------------+--------+--------+---------------+--------------+
 
-
-#### Rationale why getting and building a delegator are initially slower than zend-servicemanager (benchmarks above marked with *)
+#### Rationale why `get()` and `build()`of a delegator is initially slower than zend-servicemanager (benchmarks above marked with *)
 
 mxc-servicemanager features a cache for the callback that get's produced when a delegator gets created. It is the cost of maintaining
 this cache which makes getting or building a delegator slower on the first call.
 
 You achieve benefit from this cache, when you build or get the same delegator again. Search for entries benchFetchDelegatorCached (45%),
 benchBuildDelegatorCached (50%), benchFetchMultiDelegatorCached (69%), benchBuildMultiDelegatorCached (77%) in the benchmark table.
+
+If there are use cases where delegators are most likely created once only, we could consider to introduce an option to turn that cache off.
+
+#### Configuration speedup
+
+Before 0.5.0 there was no benchmark available to measure the performance of creating a new service manager via `configure()` for different
+sizes of configuration.
 
 ## Version 0.4.0 - 2018-02-20: ConfigAbstractFactory
 

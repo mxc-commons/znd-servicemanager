@@ -9,7 +9,7 @@ develop:
 
 ## Version
 
-Release 0.5.0 created on 2018-02-27 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.6.0 created on 2018-02-27 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.3 and can be used to substitute zend-servicemanager 3.x versions.
 
@@ -63,7 +63,7 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.5"
+        "mxc-commons/mxc-servicemanager": "^0.6"
     }
     ```
 
@@ -109,5 +109,4 @@ each version.
 ## What's next?
 
 1. Investigate provision of a lightweight alternative to lazy_services.
-2. Finalize benchmark suite
-3. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
+3. Investigate: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)

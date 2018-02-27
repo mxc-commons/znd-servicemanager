@@ -7,14 +7,13 @@ All notable changes to this project will be documented in this file, in reverse 
 ### Added
 
 - Added tests of lazy_services and delegators to almost all benchmarks.
-- Added benchmarks to measure service manager with different sizes of configuration: 25, 50, 100, 250, 500 and 1000
+- Added benchmarks to measure service manager with different sizes of configuration: 25, 50, 100, 250, 500 and 1000 services, aliases, delegators, factories and invokables each. All feature a single abstract factory.
+
 
 ### Removed
-- Removed abstract factory caching because zend-servicemanager concept proofed to be superior. Optimized zend-
-servicemanager abstract factory initialization process.
+- Removed abstract factory caching because zend-servicemanager concept proofed to be superior. Optimized zend-servicemanager abstract factory initialization process.
+- Removed FetchNewServiceManagerBench.php. This single test was replaced by UsageXXX.php benchmarks for several configuration sizes.
 - Removed AbstractFactoryCacheBench.php which got obsolete.
-- Removed FetchNewServiceManagerBench.php. This single test was replaced by UsageXXX.php benchmarks for several
-configuration sizes.
 
 ### Changed
 
@@ -22,9 +21,6 @@ configuration sizes.
 - changed addDelegator, so that it accepts an array of delegator factories as second parameter also
 - fixed FetchCachedServicesBench.php, which did not cache abstract factory based services
 - flattened the internal representation of lazy_services config.
-
-services, aliases, delegators, factories and invokables each. All feature a single abstract factory.
--
 
 ### Benchmark Comparison zend-master vs. mxc-master
 

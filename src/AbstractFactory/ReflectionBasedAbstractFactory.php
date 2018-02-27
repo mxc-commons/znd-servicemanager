@@ -88,6 +88,7 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      * @var string[]
      */
     protected $aliases = [];
+    private $parameters = null;
 
     /**
      * Constructor.

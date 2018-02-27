@@ -38,17 +38,6 @@ final class ConfigAbstractFactory implements AbstractFactoryInterface
             throw new ServiceNotCreatedException('Cannot find a `' . self::class . '` key in the config array.');
         }
 
-//         if (! isset($this->dependencies[$requestedName])) {
-//             throw new ServiceNotCreatedException(
-//                 sprintf('Dependencies config must hold a key %s.', $requestedName)
-//             );
-//         }
-
-//         if (! is_array($this->dependencies[$requestedName])) {
-//             throw new ServiceNotCreatedException(
-//                 sprintf('Dependencies config for %s must be an array or ArrayObject.', $requestedName)
-//             );
-//         }
         $this->dependencies = $config[self::class];
         $this->config = $config;
     }
@@ -88,7 +77,6 @@ final class ConfigAbstractFactory implements AbstractFactoryInterface
                 sprintf('Dependencies config for %s must be an array or ArrayObject.', $requestedName)
             );
         }
-
 
         $this->serviceDependencies = $this->dependencies[$requestedName];
         if ($this->serviceDependencies !== array_values(array_map('strval', $this->serviceDependencies))) {

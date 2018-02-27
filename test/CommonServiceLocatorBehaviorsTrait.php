@@ -32,6 +32,7 @@ use ZendTest\ServiceManager\TestAsset\SimpleAbstractFactory;
 use function call_user_func_array;
 use function restore_error_handler;
 use function set_error_handler;
+use Zend\ServiceManager\Proxy\LazyServiceFactory;
 
 trait CommonServiceLocatorBehaviorsTrait
 {
@@ -919,6 +920,57 @@ trait CommonServiceLocatorBehaviorsTrait
         ]);
         self::assertSame($sm->get('alias1'), $sm->get('alias2'));
         self::assertSame($sm->get(stdClass::class), $sm->get('alias1'));
+    }
+
+    public function testCoverageApplyConfigurationTwice()
+    {
+        $config = [
+            'services' => [
+                'service' => new stdClass,
+            ],
+            'factories' => [
+                stdClass::class => InvokableFactory::class,
+                'delegator' => SampleFactory::class,
+                'lazy_service' => SampleFactory::class,
+            ],
+            'delegators' => [
+                'delegator' => PassthroughDelegatorFactory::class,
+                'lazy_service' => LazyServiceFactory::class,
+            ],
+            'invokables' => [
+                'invokable' => stdClass::class,
+            ],
+            'lazy_services' => [
+                'class_map' => [
+                    'lazy_service' => InvokableObject::class,
+                ]
+            ],
+            'aliases' => [
+                'alias1' => 'alias2',
+                'alias2' => 'alias3',
+                'alias3' => stdClass::class,
+            ],
+        ];
+
+        $sm = $this->createContainer($config);
+        $sm->setAllowOverride(true);
+        $sm->configure($config);
+        self::assertAttributeSame($config['factories'], 'factories', $sm);
+        self::assertAttributeSame($config['services'], 'services', $sm);
+        self::assertAttributeSame($config['invokables'], 'invokables', $sm);
+        self::assertAttributeSame(
+            [
+                'alias1' => stdClass::class,
+                'alias2' => stdClass::class,
+                'alias3' => stdClass::class,
+            ],
+            'aliases',
+            $sm
+        );
+        self::assertAttributeSame($config['lazy_services']['class_map'], 'lazyServicesClassMap', $sm);
+
+        // intended behaviour unclear for this one
+        // self::assertAttributeSame($config['delegators'], 'delegators', $sm);
     }
 
     /**

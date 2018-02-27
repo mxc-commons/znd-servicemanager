@@ -112,25 +112,32 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $reflectionClass = new ReflectionClass($requestedName);
+        if ($this->parameters === null) {
+            $reflectionClass = new ReflectionClass($requestedName);
 
-        if (null === ($constructor = $reflectionClass->getConstructor())) {
+            if (null === ($constructor = $reflectionClass->getConstructor())) {
+                $this->parameters = true;
+                return new $requestedName();
+            }
+
+            $reflectionParameters = $constructor->getParameters();
+
+            if (empty($reflectionParameters)) {
+                $this->parameters = true;
+                return new $requestedName();
+            }
+
+            $resolver = $container->has('config')
+                ? $this->resolveParameterWithConfigService($container, $requestedName)
+                : $this->resolveParameterWithoutConfigService($container, $requestedName);
+
+            $this->parameters = array_map($resolver, $reflectionParameters);
+
+            return new $requestedName(...$this->parameters);
+        } elseif ($this->parameters === true) {
             return new $requestedName();
         }
-
-        $reflectionParameters = $constructor->getParameters();
-
-        if (empty($reflectionParameters)) {
-            return new $requestedName();
-        }
-
-        $resolver = $container->has('config')
-            ? $this->resolveParameterWithConfigService($container, $requestedName)
-            : $this->resolveParameterWithoutConfigService($container, $requestedName);
-
-        $parameters = array_map($resolver, $reflectionParameters);
-
-        return new $requestedName(...$parameters);
+        return new $requestedName(...$this->requestedName);
     }
 
     /**

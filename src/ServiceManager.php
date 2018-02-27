@@ -368,26 +368,22 @@ class ServiceManager implements ServiceLocatorInterface
 
         // We achieve better performance if we can let all alias
         // considerations out.
-        if (! $this->aliases) {
+        if (! isset($this->aliases[$name])) {
             $object = $this->createService($name, null);
 
             // Cache the object for later, if it is supposed to be shared.
-            if (isset($this->shared[$name]) ? $this->shared[$name] : $this->sharedByDefault) {
+            if ($this->shared[$name] ?? $this->sharedByDefault) {
                 $this->services[$name] = $object;
             }
             return $object;
         }
 
-        $sharedService = isset($this->shared[$name]) ? $this->shared[$name] : $this->sharedByDefault;
-
-        // We now deal with requests which may be aliases.
+        $sharedService = $this->shared[$name] ?? $this->sharedByDefault;
+        // We now deal with an alias
         $resolvedName = $this->aliases[$name] ?? $name;
 
-        // The following is only true if the requested service is a shared alias.
-        $sharedAlias = $sharedService && isset($this->services[$resolvedName]);
-
-        // If the alias is configured as a shared service, we are done.
-        if ($sharedAlias) {
+        // If the alias is registered as a shared service, we are done.
+        if ($sharedService && isset($this->services[$resolvedName])) {
             $this->services[$name] = $this->services[$resolvedName];
             return $this->services[$resolvedName];
         }
@@ -401,9 +397,8 @@ class ServiceManager implements ServiceLocatorInterface
             $this->services[$resolvedName] = $object;
         }
 
-        // Also cache under the alias name; this allows sharing based on the
-        // service name used.
-        if ($sharedAlias) {
+        // Also do so for aliases
+        if ($this->shared[$name] ?? $this->sharedByDefault) {
             $this->services[$name] = $object;
         }
 
@@ -428,6 +423,9 @@ class ServiceManager implements ServiceLocatorInterface
         if (isset($this->services[$name])) {
             return true;
         }
+
+        $name = $this->aliases[$name] ?? $name;
+
         if (isset($this->aliases[$name])) {
             $name = $this->aliases[$name];
         }

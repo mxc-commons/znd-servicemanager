@@ -19,6 +19,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\ServiceManager\Initializer\InitializerInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use ZendTest\ServiceManager\TestAsset\AbstractFactoryFoo;
 use ZendTest\ServiceManager\TestAsset\CallTimesAbstractFactory;
 use ZendTest\ServiceManager\TestAsset\FailingAbstractFactory;
 use ZendTest\ServiceManager\TestAsset\FailingExceptionWithStringAsCodeFactory;
@@ -27,7 +28,6 @@ use ZendTest\ServiceManager\TestAsset\InvokableObject;
 use ZendTest\ServiceManager\TestAsset\PassthroughDelegatorFactory;
 use ZendTest\ServiceManager\TestAsset\SampleFactory;
 use ZendTest\ServiceManager\TestAsset\SimpleAbstractFactory;
-use ZendTest\ServiceManager\TestAsset\AbstractFactoryFoo;
 
 use function call_user_func_array;
 use function restore_error_handler;
@@ -673,12 +673,11 @@ trait CommonServiceLocatorBehaviorsTrait
     {
         $container = $this->createContainer();
         $container->mapLazyService('foo', __CLASS__);
-        $r = new ReflectionProperty($container, 'lazyServices');
+        $r = new ReflectionProperty($container, 'lazyServicesClassMap');
         $r->setAccessible(true);
-        $lazyServices = $r->getValue($container);
-        self::assertArrayHasKey('class_map', $lazyServices);
-        self::assertArrayHasKey('foo', $lazyServices['class_map']);
-        self::assertEquals(__CLASS__, $lazyServices['class_map']['foo']);
+        $lazyServicesClassMap = $r->getValue($container);
+        self::assertArrayHasKey('foo', $lazyServicesClassMap);
+        self::assertEquals(__CLASS__, $lazyServicesClassMap['foo']);
     }
 
     /**

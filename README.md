@@ -9,20 +9,20 @@ develop:
 
 ## Version
 
-Release 0.4.1 created on 2018-02-20 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.5.0 created on 2018-02-27 by Frank Hein, maxence operations GmbH, Germany.
 
-This version is based on Zend Service Manager 3.3.2 and can be used as substitute for zend-servicemanager 3.x versions.
+This version is based on Zend Service Manager 3.3 and can be used to substitute zend-servicemanager 3.x versions.
 
 ## Introduction
 
 mxc-servicemanager is a component compatible to [zend-servicemanager  3.3](https://github.com/zendframework/zend-servicemanager "zend-servicemanager").
-Different from zend-servicemanager this component does not support 5.6.
+Different from zend-servicemanager this component does not support PHP 5.6.
 
 For mxc-servicemanager we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution.
 
 A major design constraint is zend-servicemanager compatibility. Changes to master and develop branches of zend-servicemanager will get merged into mxc-servicemanager.
 
-Our motivation to do this is our need for a fast servicemanager component and our commitment to open source.
+We provide a permanent fork, because we do not want to provide a fast service manager only, we also want to provide it fastly.
 
 
 - [File issues, ask and discuss at the issues section of mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager/issues)
@@ -30,8 +30,8 @@ Our motivation to do this is our need for a fast servicemanager component and ou
 
 ## Features / Goals
 
-* Speed up service manager configuration via configure() (almost done)
-* Speed up service manager configuration via the APIs: (done with 0.1.0)
+* Speed up service manager configuration via configure() (done)
+* Speed up service manager configuration via the APIs: (done)
     * addAbstractFactory
     * addDelegator
     * addInitializer
@@ -41,14 +41,14 @@ Our motivation to do this is our need for a fast servicemanager component and ou
     * setInvokableClass
     * setService
     * setShared
-* Speed up service delivery for (done with 0.2.0)
+* Speed up service delivery for (done)
     * aliases
     * delegators
     * invokables
     * abstract factories
 * Speed up service manager assets
-    * ConfigAbstractFactory (done with 0.4.0)
-    * ReflectionAbstractFactory
+    * ConfigAbstractFactory (done)
+    * ReflectionAbstractFactory (todo)
 
 Goal of our activities is to exploit PHP capabilities as far as possible for performance enhancements without giving up on backwards compatibility to
 zend-servicemanager 3.3.2 (currently). We are working on optimizing the PHP implementation in order to find out what the particular requirements for
@@ -71,7 +71,7 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.4"
+        "mxc-commons/mxc-servicemanager": "^0.5"
     }
     ```
 
@@ -116,12 +116,9 @@ each version.
 
 ## What's next?
 
-Enhancements:
-
-1. Refactor ReflectionAbstractFactory.
-2. Provide benchmarks modelling real world use cases (abstract factories centric app, arbitrary app, config based app, setters api based app, ...).
-3. Remove white box unit tests, that test that features are implemented in a particular way, if this implementation changes.
+1. Speed up ReflectionAbstractFactory
+2. Provide an alternative implementation for lazy services. Ocramius's proxy-manager pobably is somewhat overengineered and seems to be too expensive for service manager purposes. See benchmark section.
+3. Complete benchmark suite
 4. Investigating: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)
-5. Investigating: Introduce ServiceManager pre-compiler
-    (automatically and dynamically provide a service manager implementation which is optimized to support only the features actually used by the application)
-6. Provide tests and benchmarks for all features and changes provided by this fork.
+5. Start x1-master and x1-develop branch. After ReflectionAbstractFactory will be refactored, there seem to be no more options for further performance improvements without bc breaks. x1 will drop the bc requirement and will offer further enhancements together with migration intstructions and tools.
+6. Start x2 project evaluation (c based implementation).

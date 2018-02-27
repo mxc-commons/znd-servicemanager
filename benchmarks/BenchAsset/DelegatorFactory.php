@@ -10,7 +10,7 @@ namespace ZendBench\ServiceManager\BenchAsset;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
 
-class DelegatorFactoryFoo implements DelegatorFactoryInterface
+class DelegatorFactory implements DelegatorFactoryInterface
 {
     /**
      * {@inheritDoc}

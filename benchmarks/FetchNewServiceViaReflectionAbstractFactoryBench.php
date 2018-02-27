@@ -34,7 +34,6 @@ class FetchNewServiceViaReflectionAbstractFactoryBench
             'abstract_factories' => [
                 ReflectionBasedAbstractFactory::class,
             ],
-            'cache_abstract_factories_on_startup' => true,
         ]);
     }
 

@@ -44,71 +44,79 @@ class HasBench
             'abstract_factories' => [
                 BenchAsset\AbstractFactoryFoo::class
             ],
-            'cache_abstract_factories_on_startup' => true,
         ]);
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasFactory1()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('factory1');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasInvokable1()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('invokable1');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasService1()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
-        $sm = clone $this->sm;
 
+        $sm = clone $this->sm;
         $sm->has('service1');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasAlias1()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('alias1');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasRecursiveAlias1()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('recursiveAlias1');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasRecursiveAlias2()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('recursiveAlias2');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasAbstractFactory()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('foo');
     }
 
+    /**
+     * @todo @link https://github.com/phpbench/phpbench/issues/304
+     */
     public function benchHasNot()
     {
-        // @todo @link https://github.com/phpbench/phpbench/issues/304
         $sm = clone $this->sm;
-
         $sm->has('42');
     }
 }

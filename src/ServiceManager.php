@@ -426,9 +426,6 @@ class ServiceManager implements ServiceLocatorInterface
 
         $name = $this->aliases[$name] ?? $name;
 
-        if (isset($this->aliases[$name])) {
-            $name = $this->aliases[$name];
-        }
         if (isset($this->services[$name])) {
             return true;
         }

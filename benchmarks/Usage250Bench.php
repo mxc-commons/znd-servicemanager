@@ -15,7 +15,7 @@ use Zend\ServiceManager\ServiceManager;
 use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
 
 /**
- * @Revs(100)
+ * @Revs(200)
  * @Iterations(20)
  * @OutputTimeUnit("milliseconds", precision=3)
  * @Warmup(2)

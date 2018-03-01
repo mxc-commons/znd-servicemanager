@@ -15,7 +15,7 @@ use Zend\ServiceManager\ServiceManager;
 use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
 
 /**
- * @Revs(1000)
+ * @Revs(10000)
  * @Iterations(20)
  * @OutputTimeUnit("milliseconds", precision=3)
  * @Warmup(2)
@@ -85,7 +85,6 @@ class Usage50Bench
 
     /**
      * @OutputTimeUnit("microseconds", precision=3)
-     * @Revs(500)
      */
     public function benchFetchNewServiceManager()
     {

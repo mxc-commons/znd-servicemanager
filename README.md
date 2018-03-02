@@ -9,7 +9,7 @@ develop:
 
 ## Version
 
-Release 0.6.0 created on 2018-02-27 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.6.0 created on 2018-03-01 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.3 and can be used to substitute zend-servicemanager 3.x versions.
 
@@ -22,16 +22,13 @@ For mxc-servicemanager we refactored several parts of zend-servicemanager for be
 
 A major design constraint is zend-servicemanager compatibility. Changes to master and develop branches of zend-servicemanager will get merged into mxc-servicemanager.
 
-We provide a permanent fork, because we do not want to provide a fast service manager only, we also want to provide it fastly.
-
-
 - [File issues, ask and discuss at the issues section of mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager/issues)
 - [Online documentation of zend-servicemanager](https://docs.zendframework.com/zend-servicemanager)
 
-## Features / Goals
+## Features
 
-* Speed up service manager configuration via configure() (done)
-* Speed up service manager configuration via the APIs: (done)
+* Speed up service manager configuration via configure()
+* Speed up service manager configuration via the APIs:
     * addAbstractFactory
     * addDelegator
     * addInitializer
@@ -41,14 +38,14 @@ We provide a permanent fork, because we do not want to provide a fast service ma
     * setInvokableClass
     * setService
     * setShared
-* Speed up service delivery for (done)
+* Speed up service delivery for
     * aliases
     * delegators
     * invokables
     * abstract factories
 * Speed up service manager assets
-    * ConfigAbstractFactory (done)
-    * ReflectionAbstractFactory (todo)
+    * ConfigAbstractFactory
+* Comprehensive benchmark suite
 
 Please refer to the "State of Progress" and "Benchmark Comparison" sections at the end of this file for status details.
 
@@ -106,7 +103,3 @@ Please refer to the [change log](CHANGELOG.md) for a list of changes and enhance
 Please refer to the current release documentation or to the [CHANGELOG.md](CHANGELOG.md), which contains a comprehensive benchmark comparison for
 each version.
 
-## What's next?
-
-1. Investigate provision of a lightweight alternative to lazy_services.
-3. Investigate: Introduce service configuration pre-compiler (transform provided service manager configuration to working config (member vars) once on first request)

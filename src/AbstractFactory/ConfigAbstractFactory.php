@@ -1,7 +1,8 @@
 <?php
 /**
- * @link      http://github.com/zendframework/zend-servicemanager for the canonical source repository
+ * @link      https://github.com/zendframework/zend-servicemanager for the canonical source repository
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2018 maxence operations gmbh, Germany
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -38,17 +39,6 @@ final class ConfigAbstractFactory implements AbstractFactoryInterface
             throw new ServiceNotCreatedException('Cannot find a `' . self::class . '` key in the config array.');
         }
 
-//         if (! isset($this->dependencies[$requestedName])) {
-//             throw new ServiceNotCreatedException(
-//                 sprintf('Dependencies config must hold a key %s.', $requestedName)
-//             );
-//         }
-
-//         if (! is_array($this->dependencies[$requestedName])) {
-//             throw new ServiceNotCreatedException(
-//                 sprintf('Dependencies config for %s must be an array or ArrayObject.', $requestedName)
-//             );
-//         }
         $this->dependencies = $config[self::class];
         $this->config = $config;
     }
@@ -88,7 +78,6 @@ final class ConfigAbstractFactory implements AbstractFactoryInterface
                 sprintf('Dependencies config for %s must be an array or ArrayObject.', $requestedName)
             );
         }
-
 
         $this->serviceDependencies = $this->dependencies[$requestedName];
         if ($this->serviceDependencies !== array_values(array_map('strval', $this->serviceDependencies))) {

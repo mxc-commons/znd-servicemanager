@@ -15,7 +15,7 @@ use Zend\ServiceManager\ServiceManager;
 use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
 
 /**
- * @Revs(1000)
+ * @Revs(10000)
  * @Iterations(20)
  * @OutputTimeUnit("milliseconds", precision=3)
  * @Warmup(2)
@@ -85,7 +85,6 @@ class Usage50Bench
 
     /**
      * @OutputTimeUnit("microseconds", precision=3)
-     * @Revs(500)
      */
     public function benchFetchNewServiceManager()
     {
@@ -137,7 +136,7 @@ class Usage50Bench
         }
     }
 
-    public function benchFullCycle()
+    public function benchFullCycleBuild()
     {
         $sm = new ServiceManager($this->config);
 
@@ -150,6 +149,23 @@ class Usage50Bench
             }
             for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
                 $sm->build("factory_$i");
+            }
+        }
+    }
+
+    public function benchFullCycleGet()
+    {
+        $sm = new ServiceManager($this->config);
+
+        for ($cycle = 0; $cycle < 3; $cycle++) {
+            for ($i = 0; $i < self::NUM_SERVICES; $i++) {
+                $sm->get("service_$i");
+                $sm->get("alias_$i");
+                $sm->get("factory_$i");
+                $sm->get("invokable_$i");
+            }
+            for ($i = self::NUM_SERVICES; $i < self::NUM_SERVICES * 2; $i++) {
+                $sm->get("factory_$i");
             }
         }
     }

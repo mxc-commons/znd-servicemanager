@@ -87,7 +87,7 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      *
      * @var string[]
      */
-    protected $aliases = [];
+    protected $aliases;
 
     /**
      * Constructor.
@@ -100,9 +100,7 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
      */
     public function __construct(array $aliases = [])
     {
-        if (! empty($aliases)) {
-            $this->aliases = $aliases;
-        }
+        $this->aliases = $aliases;
     }
 
     /**
@@ -128,9 +126,8 @@ class ReflectionBasedAbstractFactory implements AbstractFactoryInterface
             ? $this->resolveParameterWithConfigService($container, $requestedName)
             : $this->resolveParameterWithoutConfigService($container, $requestedName);
 
-        $parameters = array_map($resolver, $reflectionParameters);
 
-        return new $requestedName(...$parameters);
+        return new $requestedName(...array_map($resolver, $reflectionParameters));
     }
 
     /**

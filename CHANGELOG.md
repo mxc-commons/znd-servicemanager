@@ -2,13 +2,14 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## Version 0.5.0 - 2018-02-27: Enhanced benchmark suite, optimized ConfigAbstractFactory
+## Version 0.6.0 - 2018-03-02: Benchmark suite finazilized, final code review and cleanup
 
 ### Added
 
 - Finalized benchmark suite
 
 ### Removed
+
 - nothing
 
 ### Changed

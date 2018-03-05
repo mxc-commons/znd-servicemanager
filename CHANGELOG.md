@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file, in reverse 
 ## Version 0.7.0 - 2018-03-05: Documentation finalized
 
 ### Added
-- Added brief descriptions of benchmark tests [`BENCHMARKS.md`](BENCHMARKS.md).
+- Added brief description of benchmark tests [`BENCHMARKS.md`](BENCHMARKS.md).
 
 ### Changed
 

@@ -9,18 +9,17 @@ develop:
 
 ## Version
 
-Release 0.6.0 created on 2018-03-01 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.7.0 created on 2018-03-05 by Frank Hein, maxence operations GmbH, Germany.
 
-This version is based on Zend Service Manager 3.3 and can be used to substitute zend-servicemanager 3.x versions.
-
+This version is based on Zend Service Manager 3.x and is backwards compatible with it.
 ## Introduction
 
-mxc-servicemanager is a component compatible to [zend-servicemanager  3.3](https://github.com/zendframework/zend-servicemanager "zend-servicemanager").
+mxc-servicemanager is a component compatible to [zend-servicemanager  3.x](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). It can be used to substitute zend-servicemanager 3.x versions.
 Different from zend-servicemanager this component does not support PHP 5.6.
 
 For mxc-servicemanager we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution.
 
-A major design constraint is zend-servicemanager compatibility. Changes to master and develop branches of zend-servicemanager will get merged into mxc-servicemanager.
+mxc-servicemanager will be kept compatible to zend-servicemanager. Changes to master and develop branches of zend-servicemanager will get merged into mxc-servicemanager as appropriate and applicable.
 
 - [File issues, ask and discuss at the issues section of mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager/issues)
 - [Online documentation of zend-servicemanager](https://docs.zendframework.com/zend-servicemanager)
@@ -47,8 +46,6 @@ A major design constraint is zend-servicemanager compatibility. Changes to maste
     * ConfigAbstractFactory
 * Comprehensive benchmark suite
 
-Please refer to the "State of Progress" and "Benchmark Comparison" sections at the end of this file for status details.
-
 ## Installation
 
 To install mxc-servicemanager:
@@ -60,7 +57,7 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.6"
+        "mxc-commons/mxc-servicemanager": "^0.7"
     }
     ```
 
@@ -81,25 +78,21 @@ instances get created by `new Zend\ServiceManager\ServiceManager` as before.
 
 ## License
 
-mxc-servicemanager is provided under the New BSD License. See `license.txt`.
+mxc-servicemanager is provided under the New BSD License. See [`LICENSE.md`](LICENSE.md).
 
 ## Discussion
 
 Platform for discussion of all things related to this fork is the [issues section of mxc-commons/mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager/issues).
 
-## Tests & Benchmarks
+## Status
 
-The classes provided here are unit tested with [Sebastian Bergmann's PHPUnit](https://github.com/sebastianbergmann/phpunit) unit testing framework.
-We benchmark using the [PHPBench](https://github.com/phpbench/phpbench) framework.
+Please refer to the [`CHANGELOG.md`](CHANGELOG.md) for a list of changes and enhancements. A comprehensive benchmark comparison is included for
+each version. A brief description of the benchmark tests is provided in [`BENCHMARKS.md`](BENCHMARKS.md).
 
-Please refer to the according documentation for details how to use that tools.
+## Credits
 
-## State Of Progress
+This work is based on [zend-servicemanager](https://github.com/zendframework/zend-servicemanager), which is part of the [Zend Framework](https://github.com/zendframework/zendframework). This work would not have been possible without the work Matthew Weier O'Phinney (@weierophinney) and the numerous people contributing to Zend Framework.
+Unit tests are done using  [Sebastian Bergmann's PHPUnit](https://github.com/sebastianbergmann/phpunit) unit testing framework (@sebastianbergmann).
+Benchmarks are done using [Daniel Leech's PHPBench](https://github.com/phpbench/phpbench) benchmark framework (@dantleech).
 
-Please refer to the [change log](CHANGELOG.md) for a list of changes and enhancements.
-
-## Benchmark Comparisons
-
-Please refer to the current release documentation or to the [CHANGELOG.md](CHANGELOG.md), which contains a comprehensive benchmark comparison for
-each version.
 

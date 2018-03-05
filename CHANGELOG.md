@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## Version 0.6.0 - 2018-03-02: Benchmark suite finazilized, final code review and cleanup
+## Version 0.7.0 - 2018-03-05: Documentation finalized
+
+### Added
+- Added brief description of benchmark tests [`BENCHMARKS.md`](BENCHMARKS.md).
+
+### Changed
+
+- Removed obsolote parts of README.
+- Credits added.
+
+## Version 0.6.0 - 2018-03-02: Benchmark suite finalized, final code review and cleanup
 
 ### Added
 

@@ -57,7 +57,7 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.6"
+        "mxc-commons/mxc-servicemanager": "^0.7"
     }
     ```
 

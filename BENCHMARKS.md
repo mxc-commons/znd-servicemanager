@@ -252,13 +252,6 @@ takes to satisfy requests. benchFullCycleBuild does this using `build()`, benchF
 this using `get()`. The latter case reduces the influence of the refactoring results of service manager
 to the possible minimum. Both benchmarks include the times needed for service manager configuration.
 
-The time it takes to configure a service manager is much less than the time it takes to retrieve
-services from it.
-
-So the benchFullCycleGet benchmark delivers kind of a baseline, what performance improvements you
-can expect by employing mxc-servicemanger. Granted are 5-8% regardless of your particular way to
-use service manager functionality.
-
     +----------------+---------------------+--------+---------------+--------------+
     | benchmark      | subject             | diff   | tag:zend:mean | tag:mxc:mean |
     +----------------+---------------------+--------+---------------+--------------+
@@ -316,7 +309,7 @@ The table below shows a comparison between mxc-servicemanager and zend-servicema
 
 ## Benchmark FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench
 
-This benchmark measures the time it takes to retrieve an item from a ConfigAbstractFactory, when the ConfigAbstractFactory is
+This benchmark measures the time it takes to retrieve an item from a ReflectionBasedAbstractFactory, when the ReflectionBasedAbstractFactory is
 registered as a factory to service manager. mxc-servicemanager is about 10-15% faster than zend-servicemanager. This is a side effect
 of other changes applied to the service retrieval process. We did not do anything to improve ReflectionBasedAbstractFactory's performance.
 
@@ -335,9 +328,9 @@ The table below shows a comparison between mxc-servicemanager and zend-servicema
 
 ## Benchmark FetchNewServiceViaReflectionAbstractFactoryBench
 
-This benchmark measures the time it takes to retrieve an item from a ReflectionAbstractFactory, when the ReflectionAbstractFactory is
+This benchmark measures the time it takes to retrieve an item from a ReflectionBasedAbstractFactory, when the ReflectionBasedAbstractFactory is
 registered as an abstract factory to service manager. mxc-servicemanager is about as fast as zend-servicemanager. We did not do anything
-about ReflectionAbstractFactory.
+about ReflectionBasedAbstractFactory.
 
 The table below shows a comparison between mxc-servicemanager and zend-servicemanager for this benchmark.
 
@@ -352,14 +345,6 @@ The table below shows a comparison between mxc-servicemanager and zend-servicema
     | FetchNewServiceViaReflectionAbstractFactoryBench | benchFetchServiceWithNoDependencies | 1.04x  | 3.328µs       | 3.190µs      |
     +--------------------------------------------------+-------------------------------------+--------+---------------+--------------+
 
-## Conclusion
-
-Assuming arbitrary usage of service manager, mxc-servicemanager can grant no more than 5-8% performance advantage, depending on the
-number of services administered by service manager. This may not be interesting for an OSS approach aiming at 'one size fits all'. The
-one size zend-servicemanager provides for arbitrary usage is ok.
-
-But this implementation speeds up configuration by at least 300%. It speeds up several APIs the same or even more. So 5-8% is a baseline only.
-Any usage different from just using shared services only will profit more, while standard users will get 5-8% at least.
 
 
 

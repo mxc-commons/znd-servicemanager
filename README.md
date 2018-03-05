@@ -14,7 +14,7 @@ Release 0.7.0 created on 2018-03-05 by Frank Hein, maxence operations GmbH, Germ
 This version is based on Zend Service Manager 3.x and is backwards compatible with it.
 ## Introduction
 
-mxc-servicemanager is a component compatible to [zend-servicemanager  3.x](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). It and can be used to substitute zend-servicemanager 3.x versions.
+mxc-servicemanager is a component compatible to [zend-servicemanager  3.x](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). It can be used to substitute zend-servicemanager 3.x versions.
 Different from zend-servicemanager this component does not support PHP 5.6.
 
 For mxc-servicemanager we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution.

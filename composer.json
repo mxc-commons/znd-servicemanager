@@ -12,12 +12,13 @@
         "services",
         "servicemanager",
         "service-manager",
-        "mxc-commons"
+        "mxc-commons",
+        "servicemanager component"
     ],
     "support": {
         "docs": "https://docs.zendframework.com/zend-servicemanager/",
-        "issues": "https://github.com/mxc-commons/mxc-services/issues",
-        "source": "https://github.com/mxc-commons/mxc-services"
+        "issues": "https://github.com/mxc-commons/mxc-servicemanager/issues",
+        "source": "https://github.com/mxc-commons/mxc-servicemanager"
     },
     "require": {
         "php": "^7.1",

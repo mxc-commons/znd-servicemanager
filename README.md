@@ -9,7 +9,7 @@ develop:
 
 ## Version
 
-Release 0.7.0 created on 2018-03-05 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.7.1 created on 2018-03-07 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.x and is backwards compatible with it.
 ## Introduction
@@ -54,7 +54,6 @@ To install mxc-servicemanager:
 
 1. Add a dependency to mxc-servicemanager to your composer.json
 
-
     ```json
     "require": {
         "mxc-commons/mxc-servicemanager": "^0.7"
@@ -91,8 +90,10 @@ each version. A brief description of the benchmark tests is provided in [`BENCHM
 
 ## Credits
 
-This work is based on [zend-servicemanager](https://github.com/zendframework/zend-servicemanager), which is part of the [Zend Framework](https://github.com/zendframework/zendframework). This work would not have been possible without the work Matthew Weier O'Phinney (@weierophinney) and the numerous people contributing to Zend Framework.
+This work is based on [zend-servicemanager](https://github.com/zendframework/zend-servicemanager), which is part of the [Zend Framework](https://github.com/zendframework/zendframework). This work would not have been possible without the work of Matthew Weier O'Phinney (@weierophinney) and the numerous people contributing to Zend Framework.
+
 Unit tests are done using  [Sebastian Bergmann's PHPUnit](https://github.com/sebastianbergmann/phpunit) unit testing framework (@sebastianbergmann).
+
 Benchmarks are done using [Daniel Leech's PHPBench](https://github.com/phpbench/phpbench) benchmark framework (@dantleech).
 
 

@@ -534,11 +534,9 @@ class ServiceManager implements ServiceLocatorInterface
             $object = $creationCallback($this->creationContext, $name, $creationCallback, $options);
             return $object;
         }
+
         $creationCallback = function () use ($name, $options) {
-            if ($this->factories[$name]) {
-                return $this->createServiceFromFactory($name, $options);
-            }
-            return $this->createServiceFromAbstractFactory($name, $options);
+            return $this->createServiceFromFactory($name, $options);
         };
 
         foreach ($this->delegators[$name] as $index => $delegatorFactory) {

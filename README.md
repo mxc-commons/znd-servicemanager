@@ -9,7 +9,7 @@ develop:
 
 ## Version
 
-Release 0.7.0 created on 2018-03-05 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.7.1 created on 2018-03-07 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.x and is backwards compatible with it.
 ## Introduction
@@ -53,7 +53,6 @@ To install mxc-servicemanager:
 1. Remove dependencies to zend-servicemanager from your project.
 
 1. Add a dependency to mxc-servicemanager to your composer.json
-
 
     ```json
     "require": {

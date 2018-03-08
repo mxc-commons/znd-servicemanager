@@ -9,7 +9,7 @@ develop:
 
 ## Version
 
-Release 0.7.1 created on 2018-03-07 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.7.2 created on 2018-03-08 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.x and is backwards compatible with it.
 ## Introduction

@@ -1,6 +1,6 @@
 {
     "name": "mxc-commons/mxc-servicemanager",
-    "description": "Permanent fork of Zend ServiceManager 3 refactored for performance.",
+    "description": "Permanent fork of Zend ServiceManager 3 refactored for better performance.",
     "license": "BSD-3-Clause",
     "keywords": [
         "di",
@@ -13,7 +13,7 @@
         "servicemanager",
         "service-manager",
         "mxc-commons",
-        "servicemanager component"
+        "servicemanager-component"
     ],
     "support": {
         "docs": "https://docs.zendframework.com/zend-servicemanager/",
@@ -27,10 +27,10 @@
         "zendframework/zend-stdlib": "^3.1"
     },
     "require-dev": {
-        "mikey179/vfsStream": "^1.6.4",
+        "mikey179/vfsStream": "^1.6.5",
         "ocramius/proxy-manager": "^2.1.1",
         "phpbench/phpbench": "dev-master",
-        "phpunit/phpunit": "^6.4.4",
+        "phpunit/phpunit": "^6.5.7",
         "zendframework/zend-coding-standard": "~1.0.0"
     },
     "replace": {

@@ -424,19 +424,30 @@ class ServiceManager implements ServiceLocatorInterface
             return true;
         }
 
-        $name = $this->aliases[$name] ?? $name;
-
-        if (isset($this->services[$name])) {
-            return true;
-        }
         if (isset($this->factories[$name])) {
             return true;
         }
         if (isset($this->invokables[$name])) {
             return true;
         }
+
+        $resolvedName = $this->aliases[$name] ?? $name;
+
+        if ($resolvedName !== $name) {
+            if (isset($this->services[$resolvedName])) {
+                return true;
+            }
+
+            if (isset($this->factories[$resolvedName])) {
+                return true;
+            }
+            if (isset($this->invokables[$resolvedName])) {
+                return true;
+            }
+        }
+
         foreach ($this->abstractFactories as $abstractFactory) {
-            if ($abstractFactory->canCreate($this->creationContext, $name)) {
+            if ($abstractFactory->canCreate($this->creationContext, $resolvedName)) {
                 return true;
             }
         }

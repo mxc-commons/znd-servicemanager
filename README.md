@@ -9,9 +9,10 @@ develop:
 
 ## Version
 
-Release 0.7.3 created on 2018-03-12 by Frank Hein, maxence operations GmbH, Germany.
+Release 0.8.0 created on 2018-03-13 by Frank Hein, maxence operations GmbH, Germany.
 
 This version is based on Zend Service Manager 3.x and is backwards compatible with it.
+
 ## Introduction
 
 mxc-servicemanager is a component compatible to [zend-servicemanager  3.x](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). It can be used to substitute zend-servicemanager 3.x versions.
@@ -56,7 +57,7 @@ To install mxc-servicemanager:
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^0.7"
+        "mxc-commons/mxc-servicemanager": "^0.8"
     }
     ```
 
@@ -95,5 +96,3 @@ This work is based on [zend-servicemanager](https://github.com/zendframework/zen
 Unit tests are done using  [Sebastian Bergmann's PHPUnit](https://github.com/sebastianbergmann/phpunit) unit testing framework (@sebastianbergmann).
 
 Benchmarks are done using [Daniel Leech's PHPBench](https://github.com/phpbench/phpbench) benchmark framework (@dantleech).
-
-

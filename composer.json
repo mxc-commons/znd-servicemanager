@@ -1,80 +1,80 @@
 {
-    "name": "mxc-commons/mxc-servicemanager",
-    "description": "Permanent fork of Zend ServiceManager 3 refactored for better performance.",
-    "license": "BSD-3-Clause",
-    "keywords": [
-        "di",
-        "dic",
-        "dependency-injection",
-        "psr-11",
-        "zf",
-        "zendframework",
-        "services",
-        "servicemanager",
-        "service-manager",
-        "mxc-commons",
-        "servicemanager-component"
-    ],
-    "support": {
-        "docs": "https://docs.zendframework.com/zend-servicemanager/",
-        "issues": "https://github.com/mxc-commons/mxc-servicemanager/issues",
-        "source": "https://github.com/mxc-commons/mxc-servicemanager"
-    },
-    "require": {
-        "php": "^7.1",
-        "container-interop/container-interop": "^1.2",
-        "psr/container": "^1.0",
-        "zendframework/zend-stdlib": "^3.1"
-    },
-    "require-dev": {
-        "mikey179/vfsStream": "^1.6.5",
-        "ocramius/proxy-manager": "^2.1.1",
-        "phpbench/phpbench": "dev-master",
-        "phpunit/phpunit": "^6.5.7",
-        "zendframework/zend-coding-standard": "~1.0.0"
-    },
-    "replace": {
-        "zendframework/zend-servicemanager": "3.*"
-    },
-    "provide": {
-        "container-interop/container-interop-implementation": "^1.2",
-        "psr/container-implementation": "^1.0"
-    },
-    "suggest": {
-        "ocramius/proxy-manager": "ProxyManager ^2.1.1 to handle lazy initialization of services",
-        "zendframework/zend-stdlib": "zend-stdlib ^2.7.7 | ^3.1 if you wish to use the MergeReplaceKey or MergeRemoveKey features in Config instances"
-    },
-    "autoload": {
-        "psr-4": {
-            "Zend\\ServiceManager\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "ZendTest\\ServiceManager\\": "test/",
-            "ZendBench\\ServiceManager\\": "benchmarks/"
-        }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.8.x-dev"
-        }
-    },
-    "bin": [
-        "bin/generate-deps-for-config-factory",
-        "bin/generate-factory-for-class"
-    ],
-    "scripts": {
-        "check": [
-            "@cs-check",
-            "@test"
-        ],
-        "cs-check": "phpcs",
-        "cs-fix": "phpcbf",
-        "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
-    }
+	"name" : "mxc-commons/mxc-servicemanager",
+	"description" : "Permanent fork of Zend ServiceManager 3 refactored for better performance.",
+	"license" : "BSD-3-Clause",
+	"keywords" : [
+		"di",
+		"dic",
+		"dependency-injection",
+		"psr-11",
+		"zf",
+		"zendframework",
+		"services",
+		"servicemanager",
+		"service-manager",
+		"mxc-commons",
+		"servicemanager-component"
+	],
+	"support" : {
+		"docs" : "https://docs.zendframework.com/zend-servicemanager/",
+		"issues" : "https://github.com/mxc-commons/mxc-servicemanager/issues",
+		"source" : "https://github.com/mxc-commons/mxc-servicemanager"
+	},
+	"require" : {
+		"php" : "^7.1",
+		"container-interop/container-interop" : "^1.2",
+		"psr/container" : "^1.0",
+		"zendframework/zend-stdlib" : "^3.1"
+	},
+	"require-dev" : {
+		"mikey179/vfsStream" : "^1.6.5",
+		"ocramius/proxy-manager" : "^2.1.1",
+		"phpbench/phpbench" : "dev-master",
+		"phpunit/phpunit" : "^6.5.7",
+		"zendframework/zend-coding-standard" : "~1.0.0"
+	},
+	"replace" : {
+		"zendframework/zend-servicemanager" : "3.*"
+	},
+	"provide" : {
+		"container-interop/container-interop-implementation" : "^1.2",
+		"psr/container-implementation" : "^1.0"
+	},
+	"suggest" : {
+		"ocramius/proxy-manager" : "ProxyManager ^2.1.1 to handle lazy initialization of services",
+		"zendframework/zend-stdlib" : "zend-stdlib ^2.7.7 | ^3.1 if you wish to use the MergeReplaceKey or MergeRemoveKey features in Config instances"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Zend\\ServiceManager\\" : "src/"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"ZendTest\\ServiceManager\\" : "test/",
+			"ZendBench\\ServiceManager\\" : "benchmarks/"
+		}
+	},
+	"config" : {
+		"sort-packages" : true
+	},
+	"extra" : {
+		"branch-alias" : {
+			"dev-master" : "0.9.x-dev"
+		}
+	},
+	"bin" : [
+		"bin/generate-deps-for-config-factory",
+		"bin/generate-factory-for-class"
+	],
+	"scripts" : {
+		"check" : [
+			"@cs-check",
+			"@test"
+		],
+		"cs-check" : "phpcs",
+		"cs-fix" : "phpcbf",
+		"test" : "phpunit --colors=always",
+		"test-coverage" : "phpunit --colors=always --coverage-clover clover.xml"
+	}
 }

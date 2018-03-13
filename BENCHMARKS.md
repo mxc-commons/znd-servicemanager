@@ -57,9 +57,9 @@ factories (about 34%).
 
 ## Benchmark HasBench
 
-This benchmark measures the performance if the `has()` member of service manager. The results of both implementations
-are almost the same except benchHasFactory1, which is 7% slower with mxc-servicemanager. Reason for that is unclear.
-Maybe a glitch in PHPBench.
+This benchmark measures the performance if the `has()` member of service manager. While `has(alias)` is slightly
+slower than zend-servicemanager now, `has` for all other items mxc-servicemanager is significantly faster than
+zend-servicemanager.
 
 ## Benchmark SetNewServiceBench
 

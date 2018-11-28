@@ -27,7 +27,7 @@ znd-servicemanager will be kept compatible to zend-servicemanager. Changes to ma
 
 ## Features
 
-* Speed up service manager configuration via configure()
+* Speed up service manager configuration via configure() 
 * Speed up service manager configuration via the APIs:
     * addAbstractFactory
     * addDelegator

@@ -1,10 +1,10 @@
 # znd-servicemanager
 
 master:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/znd-servicemanager.svg?branch=master)](https://secure.travis-ci.org/mxc-commons/znd-servicemanager)
+[![Build Status](https://travis-ci.org/mxc-commons/znd-servicemanager.svg?branch=master)](https://travis-ci.org/mxc-commons/znd-servicemanager)
 [![Coverage Status](https://coveralls.io/repos/github/mxc-commons/znd-servicemanager/badge.svg?branch=master)](https://coveralls.io/github/mxc-commons/znd-servicemanager?branch=master)
 develop:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/znd-servicemanager.svg?branch=develop)](https://secure.travis-ci.org/mxc-commons/znd-servicemanager)
+[![Build Status](https://travis-ci.org/mxc-commons/znd-servicemanager.svg?branch=develop)](https://travis-ci.org/mxc-commons/znd-servicemanager)
 [![Coverage Status](https://coveralls.io/repos/github/mxc-commons/znd-servicemanager/badge.svg?branch=develop)](https://coveralls.io/github/mxc-commons/znd-servicemanager?branch=develop)
 
 ## Version

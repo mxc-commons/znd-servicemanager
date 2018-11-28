@@ -1,6 +1,6 @@
 <?php
 /**
- * @link      https://github.com/mxc-commobs/mxc-servicemanager for the canonical source repository
+ * @link      https://github.com/mxc-commobs/znd-servicemanager for the canonical source repository
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @copyright Copyright (c) 2018 maxence operations gmbh, Germany
  * @license   http://framework.zend.com/license/new-bsd New BSD License

@@ -1,5 +1,5 @@
 {
-	"name" : "mxc-commons/mxc-servicemanager",
+	"name" : "mxc-commons/znd-servicemanager",
 	"description" : "Permanent fork of Zend ServiceManager 3 refactored for better performance.",
 	"license" : "BSD-3-Clause",
 	"keywords" : [
@@ -17,8 +17,8 @@
 	],
 	"support" : {
 		"docs" : "https://docs.zendframework.com/zend-servicemanager/",
-		"issues" : "https://github.com/mxc-commons/mxc-servicemanager/issues",
-		"source" : "https://github.com/mxc-commons/mxc-servicemanager"
+		"issues" : "https://github.com/mxc-commons/znd-servicemanager/issues",
+		"source" : "https://github.com/mxc-commons/znd-servicemanager"
 	},
 	"require" : {
 		"php" : "^7.1",

@@ -1,6 +1,6 @@
-# Benchmarking mxc-servicemanager
+# Benchmarking znd-servicemanager
 
-We provide a comprehensive suite of benchmark tests to measure mxc-servicemanager. Test implementations can be found in the files
+We provide a comprehensive suite of benchmark tests to measure znd-servicemanager. Test implementations can be found in the files
 listed below. This document delivers short descriptions of the tests. The whole suite was backported to zend-servicemanager:master
 to be able to compare the results.
 
@@ -30,11 +30,11 @@ manager from this config.
 Because several item types (aliases, invokables (zend)) require additional operations on setup, the overhead of these
 additional setup gets unrevealed.
 
-The test for services and factories only is expected to run fastest with both zend-servicemanager and mxc-servicemanager.
+The test for services and factories only is expected to run fastest with both zend-servicemanager and znd-servicemanager.
 Delegators are expected to run somewhat slower, because there are delegator and factory definitions involved. Aliases
 are expected to run slowest on both implementations, because of alias resolution.
 
-The biggest performance increase provided by mxc-servicemanager is for aliases because of the much better resolution
+The biggest performance increase provided by znd-servicemanager is for aliases because of the much better resolution
 algorithm, followed by invokables.
 
 ## Benchmark FetchCachedServicesBench
@@ -52,19 +52,19 @@ the $creationCallback of delegators, this overhead is almost compensated by othe
 The new cache improves performance of consecutive requests for the same delegator by 45-75% and of consecutive
 requests for the same lazy service by 56%.
 
-Requests for aliased services are about 30% faster with mxc-servicemanager. Same for invokables (about 87%) and
+Requests for aliased services are about 30% faster with znd-servicemanager. Same for invokables (about 87%) and
 factories (about 34%).
 
 ## Benchmark HasBench
 
 This benchmark measures the performance if the `has()` member of service manager. While `has(alias)` is slightly
-slower than zend-servicemanager now, `has` for all other items mxc-servicemanager is significantly faster than
+slower than zend-servicemanager now, `has` for all other items znd-servicemanager is significantly faster than
 zend-servicemanager.
 
 ## Benchmark SetNewServiceBench
 
 This benchmark measures the time it takes to add an item to the service manager configuration using the
-"setter APIs" (mutability APIs). mxc-servicemanager is far faster than zend-servicemanager for all item
+"setter APIs" (mutability APIs). znd-servicemanager is far faster than zend-servicemanager for all item
 types. Minimum performance gain (addInitializerByClassName) is 81%, maximum performance gain (overrideAlias) is
 3.658,00%.
 
@@ -83,7 +83,7 @@ The fetchNewServiceManager test measures the time it takes to construct and init
 for the respective number of items. The results show, that as a result of refactoring the configuration
 process not only configurations with a very large number (e.g. 1000) of services each profit.
 
-The relative performance gain provided by mxc-servicemanager is even higher if the number of total
+The relative performance gain provided by znd-servicemanager is even higher if the number of total
 services enters ranges more realistical to common use cases (50 or 100 services of each type).
 
 With each of the UsageXXX.php benchmarks there are three tests focussing the performance of the
@@ -116,24 +116,24 @@ to the possible minimum. Both benchmarks include the times needed for service ma
 ## Benchmark FetchNewServiceUsingConfigAbstractFactoryAsFactoryBench
 
 This benchmark measures the time it takes to retrieve an item from a ConfigAbstractFactory, when the ConfigAbstractFactory is
-registered as a factory to service manager. mxc-servicemanager is about 20-26% faster than zend-servicemanager. This is a side effect
+registered as a factory to service manager. znd-servicemanager is about 20-26% faster than zend-servicemanager. This is a side effect
 of other changes applied to the service retrieval process, not in particular related to changes to ConfigAbstractFactory
 
 ## Benchmark FetchNewServiceViaConfigAbstractFactoryBench
 
 This benchmark measures the time it takes to retrieve an item from a ConfigAbstractFactory, when the ConfigAbstractFactory is
-registered as an abstract factory to service manager. mxc-servicemanager is about 37-45% faster than zend-servicemanager. This is a result
+registered as an abstract factory to service manager. znd-servicemanager is about 37-45% faster than zend-servicemanager. This is a result
 of adding some caching capability to ConfigAbstractFactory.
 
 
 ## Benchmark FetchNewServiceUsingReflectionAbstractFactoryAsFactoryBench
 
 This benchmark measures the time it takes to retrieve an item from a ReflectionBasedAbstractFactory, when the ReflectionBasedAbstractFactory is
-registered as a factory to service manager. mxc-servicemanager is about 19-28% faster than zend-servicemanager. This is a side effect
+registered as a factory to service manager. znd-servicemanager is about 19-28% faster than zend-servicemanager. This is a side effect
 of other changes applied to the service retrieval process. We did not do anything to improve ReflectionBasedAbstractFactory's performance.
 
 ## Benchmark FetchNewServiceViaReflectionAbstractFactoryBench
 
 This benchmark measures the time it takes to retrieve an item from a ReflectionBasedAbstractFactory, when the ReflectionBasedAbstractFactory is
-registered as an abstract factory to service manager. mxc-servicemanager is about 8-19% faster than zend-servicemanager. We did not do anything
+registered as an abstract factory to service manager. znd-servicemanager is about 8-19% faster than zend-servicemanager. We did not do anything
 about ReflectionBasedAbstractFactory.

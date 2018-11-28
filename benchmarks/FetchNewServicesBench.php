@@ -1,6 +1,6 @@
 <?php
 /**
- * @link      https://github.com/mxc-commons/mxc-servicemanager for the canonical source repository
+ * @link      https://github.com/mxc-commons/znd-servicemanager for the canonical source repository
  * @copyright Copyright (c) 2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @copyright Copyright (c) 2018 maxence operations gmbh, Germany
  * @license   http://framework.zend.com/license/new-bsd New BSD License
@@ -11,9 +11,9 @@ namespace ZendBench\ServiceManager;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
 use PhpBench\Benchmark\Metadata\Annotations\Revs;
 use PhpBench\Benchmark\Metadata\Annotations\Warmup;
+use Zend\ServiceManager\Proxy\LazyServiceFactory;
 use Zend\ServiceManager\ServiceManager;
 use ZendBench\ServiceManager\BenchAsset\DelegatorFactory;
-use Zend\ServiceManager\Proxy\LazyServiceFactory;
 
 /**
  * @Revs(100000)

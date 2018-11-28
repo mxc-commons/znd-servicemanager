@@ -1,11 +1,11 @@
-# mxc-servicemanager
+# znd-servicemanager
 
 master:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-servicemanager.svg?branch=master)](https://secure.travis-ci.org/mxc-commons/mxc-servicemanager)
-[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-servicemanager/badge.svg?branch=master)](https://coveralls.io/github/mxc-commons/mxc-servicemanager?branch=master)
+[![Build Status](https://secure.travis-ci.org/mxc-commons/znd-servicemanager.svg?branch=master)](https://secure.travis-ci.org/mxc-commons/znd-servicemanager)
+[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/znd-servicemanager/badge.svg?branch=master)](https://coveralls.io/github/mxc-commons/znd-servicemanager?branch=master)
 develop:
-[![Build Status](https://secure.travis-ci.org/mxc-commons/mxc-servicemanager.svg?branch=develop)](https://secure.travis-ci.org/mxc-commons/mxc-servicemanager)
-[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/mxc-servicemanager/badge.svg?branch=develop)](https://coveralls.io/github/mxc-commons/mxc-servicemanager?branch=develop)
+[![Build Status](https://secure.travis-ci.org/mxc-commons/znd-servicemanager.svg?branch=develop)](https://secure.travis-ci.org/mxc-commons/znd-servicemanager)
+[![Coverage Status](https://coveralls.io/repos/github/mxc-commons/znd-servicemanager/badge.svg?branch=develop)](https://coveralls.io/github/mxc-commons/znd-servicemanager?branch=develop)
 
 ## Version
 
@@ -15,14 +15,14 @@ This version is based on Zend Service Manager 3.x and is backwards compatible wi
 
 ## Introduction
 
-mxc-servicemanager is a component compatible to [zend-servicemanager  3.x](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). It can be used to substitute zend-servicemanager 3.x versions.
+znd-servicemanager is a component compatible to [zend-servicemanager  3.x](https://github.com/zendframework/zend-servicemanager "zend-servicemanager"). It can be used to substitute zend-servicemanager 3.x versions.
 Different from zend-servicemanager this component does not support PHP 5.6.
 
-For mxc-servicemanager we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution.
+For znd-servicemanager we refactored several parts of zend-servicemanager for better performance. This includes configuration and setup, factory caching and service resolution.
 
-mxc-servicemanager will be kept compatible to zend-servicemanager. Changes to master and develop branches of zend-servicemanager will get merged into mxc-servicemanager as appropriate and applicable.
+znd-servicemanager will be kept compatible to zend-servicemanager. Changes to master and develop branches of zend-servicemanager will get merged into znd-servicemanager as appropriate and applicable.
 
-- [File issues, ask and discuss at the issues section of mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager/issues)
+- [File issues, ask and discuss at the issues section of znd-servicemanager](https://github.com/mxc-commons/znd-servicemanager/issues)
 - [Online documentation of zend-servicemanager](https://docs.zendframework.com/zend-servicemanager)
 
 ## Features
@@ -49,15 +49,15 @@ mxc-servicemanager will be kept compatible to zend-servicemanager. Changes to ma
 
 ## Installation
 
-To install mxc-servicemanager:
+To install znd-servicemanager:
 
 1. Remove dependencies to zend-servicemanager from your project.
 
-1. Add a dependency to mxc-servicemanager to your composer.json
+1. Add a dependency to znd-servicemanager to your composer.json
 
     ```json
     "require": {
-        "mxc-commons/mxc-servicemanager": "^1.0"
+        "mxc-commons/znd-servicemanager": "^1.0"
     }
     ```
 
@@ -73,16 +73,16 @@ To install mxc-servicemanager:
 
 3. Run composer update
 
-Now you can use Zend\ServiceManager the way you are used to use it. zend-servicemanager is transparently replaced by mxc-servicemanager. mxc-servicemanager
+Now you can use Zend\ServiceManager the way you are used to use it. zend-servicemanager is transparently replaced by znd-servicemanager. znd-servicemanager
 instances get created by `new Zend\ServiceManager\ServiceManager` as before.
 
 ## License
 
-mxc-servicemanager is provided under the New BSD License. See [`LICENSE.md`](LICENSE.md).
+znd-servicemanager is provided under the New BSD License. See [`LICENSE.md`](LICENSE.md).
 
 ## Discussion
 
-Platform for discussion of all things related to this fork is the [issues section of mxc-commons/mxc-servicemanager](https://github.com/mxc-commons/mxc-servicemanager/issues).
+Platform for discussion of all things related to this fork is the [issues section of mxc-commons/znd-servicemanager](https://github.com/mxc-commons/znd-servicemanager/issues).
 
 ## Status
 

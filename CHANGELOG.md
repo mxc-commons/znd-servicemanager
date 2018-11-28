@@ -561,7 +561,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Benchmark Comparison zend-master vs. mxc-master
 There are two comparisons provided. One sorted by benchmark and subject. The other sorted by difference between
-zend-servicemanager and mxc-servicemanager. Diff > 1 means mxc-servicemanager is faster.
+zend-servicemanager and znd-servicemanager. Diff > 1 means znd-servicemanager is faster.
 
 The benchmark comparison is based on a patched version of PHPBench 0.15-dev.
 The patch adds and computes the `diff` column and sorts descendig by this column. All tests were
@@ -859,7 +859,7 @@ All benchmarks were run with 50 iterations and a retry_threshold of 2 to ensure 
 ### Benchmark Comparison zend-master vs. mxc-master
 
 Benchmark sorting was changed. Benchmarks are now displayed desendant sorted by difference between implementations.
-Diff > 1 means, mxc-servicemanager is faster. Diff < 1 means zend-servicemanager implementation is faster.
+Diff > 1 means, znd-servicemanager is faster. Diff < 1 means zend-servicemanager implementation is faster.
 
 The benchmark comparison is based on a patched version of PHPBench 0.15-dev.
 The patch adds and computes the `diff` column and sorts descendig by this column. All tests were
@@ -995,7 +995,7 @@ All benchmarks were run with 50 iterations and a retry_threshold of 2 to ensure 
 
 #### Rationale why `get()` and `build()`of a delegator is initially slower than zend-servicemanager (benchmarks above marked with *)
 
-mxc-servicemanager features a cache for the callback that get's produced when a delegator gets created. It is the cost of maintaining
+znd-servicemanager features a cache for the callback that get's produced when a delegator gets created. It is the cost of maintaining
 this cache which makes getting or building a delegator slower on the first call.
 
 You achieve benefit from this cache, when you build or get the same delegator again. Search for entries benchFetchDelegatorCached (45%),
@@ -1030,10 +1030,10 @@ sizes of configuration.
 
 ### Benchmark comparison
 
-Here is a new full benchmark comparison. The diff column says, how much time zend-servicemanager needs compared to mxc-servicemanager. For example: The first line of the report below
-says: zend-servicemanager needs 2,99x the time mxc-servicemanager needs to complete the benchFetchServiceManagerCreation test which can be found in FetchNewServiceManagerBench.php.
+Here is a new full benchmark comparison. The diff column says, how much time zend-servicemanager needs compared to znd-servicemanager. For example: The first line of the report below
+says: zend-servicemanager needs 2,99x the time znd-servicemanager needs to complete the benchFetchServiceManagerCreation test which can be found in FetchNewServiceManagerBench.php.
 
-Tests, where mxc-servicemanager is slower than zend-servicemanager are marked with an asterisk (*) for your convenience.
+Tests, where znd-servicemanager is slower than zend-servicemanager are marked with an asterisk (*) for your convenience.
 
     +-------------------------------------------------------------+-------------------------------------------+--------+--------+--------+-----------------+----------------+--------+
     | benchmark                                                   | subject                                   | groups | params | revs   | suite:zend:mean | suite:mxc:mean | diff   |
@@ -1141,17 +1141,17 @@ See 0.2.0 below.
 
 ### Changed
 
-- Restructured Packagist offering mxc-servicemanager to provide full repo. This way the
+- Restructured Packagist offering znd-servicemanager to provide full repo. This way the
   full benchmark suite and phpunit suite gets available.
 
-- Former reduced offering mxc-servicemanager has been changed to mxc-servicemanager-s. Low
-footprint, MxcCommons namespace, dependency to mxc-servicemanager.
+- Former reduced offering znd-servicemanager has been changed to znd-servicemanager-s. Low
+footprint, MxcCommons namespace, dependency to znd-servicemanager.
 
 - Documentation adjusted to reflect changes above.
 
 ### Deprecated
 
-- mxc-services GitHub repo. It's now mxc-servicemanager.
+- mxc-services GitHub repo. It's now znd-servicemanager.
 
 
 ### Benchmark Comparison zend-master vs. mxc-master

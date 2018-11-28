@@ -49,7 +49,7 @@ znd-servicemanager will be kept compatible to zend-servicemanager. Changes to ma
 
 ## Installation
 
-To install znd-servicemanager:
+To install znd-servicemanager: 
 
 1. Remove dependencies to zend-servicemanager from your project.
 

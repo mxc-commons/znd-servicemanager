@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## Version 1.0 - 2018-11-26: Stable
+### Changed
+- Github repository name switched from mxc-servicemanager to znd-servicemanager.
+- Packagist package name switched from mxc-servicemanager to znd-servicemanager.
+- Documentation updated to reflect these changes.
+- No code changes. 
+
+Note: znd-servicemanager will maintain compatibility with zend-servicemanager. [mxc-servicemanager](https://packagist.org/packages/mxc-commons/mxc-servicemanager) is a component
+based on znd-servicemanager, but lives in a distinct namespace and is not constrained to be compatible with zend-servicemanager.
+
 ## Version 0.9.0 - 2018-03-13: Reworked has() to prefer non-alias resolution
 
 ### Changed
